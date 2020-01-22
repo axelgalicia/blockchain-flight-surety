@@ -44,5 +44,7 @@
     "webpack-node-externals": "^1.7.2",
     "solium": "^1.2.5"
   },
-  "dependencies": {}
+  "dependencies": {
+    "bitcore-mnemonic": "^8.14.4"
+  }
 }

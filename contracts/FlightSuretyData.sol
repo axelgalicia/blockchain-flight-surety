@@ -25,6 +25,13 @@ contract FlightSuretyData {
         contractOwner = msg.sender;
     }
 
+    /**
+    * @dev Fallback function for funding smart contract.
+    */
+    fallback() external payable {
+        fund();
+    }
+
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
     /********************************************************************************************/
@@ -48,21 +55,6 @@ contract FlightSuretyData {
     modifier requireContractOwner() {
         require(msg.sender == contractOwner, "Caller is not contract owner");
         _;
-    }
-
-    /********************************************************************************************/
-    /*                                       UTILITY FUNCTIONS                                  */
-    /********************************************************************************************/
-
-    /**
-    * @dev Get operating status of contract
-    *
-    * @return A bool that is the current operating status
-    */      
-    function isOperational() public view 
-        returns(bool) 
-    {
-        return operational;
     }
 
 
@@ -110,6 +102,21 @@ contract FlightSuretyData {
     function pay() external pure {
     }
 
+    /********************************************************************************************/
+    /*                                       UTILITY FUNCTIONS                                  */
+    /********************************************************************************************/
+
+    /**
+    * @dev Get operating status of contract
+    *
+    * @return A bool that is the current operating status
+    */      
+    function isOperational() public view 
+        returns(bool) 
+    {
+        return operational;
+    }
+
    /**
     * @dev Initial funding for the insurance. Unless there are too many delayed flights
     *      resulting in insurance payouts, the contract should be self-sustaining
@@ -123,13 +130,6 @@ contract FlightSuretyData {
         string memory flight,
         uint256 timestamp) internal pure returns(bytes32) {
         return keccak256(abi.encodePacked(airline, flight, timestamp));
-    }
-
-    /**
-    * @dev Fallback function for funding smart contract.
-    */
-    fallback() external payable {
-        fund();
     }
 
 }
