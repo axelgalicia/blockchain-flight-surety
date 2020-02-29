@@ -1,5 +1,5 @@
 var HDWalletProvider = require("truffle-hdwallet-provider");
-var mnemonic = "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
+var mnemonic = "syrup nurse bulk upper vote sing lesson wrist wall awkward spoon town";
 
 module.exports = {
   networks: {
@@ -13,7 +13,7 @@ module.exports = {
   },
   compilers: {
     solc: {
-      version: "0.6.1"
+      version: "0.6.3"
     }
   }
 };
