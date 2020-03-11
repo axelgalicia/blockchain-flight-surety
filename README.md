@@ -21,6 +21,7 @@ To run truffle tests:
 To use the dapp:
 
 `truffle migrate`
+
 `npm run dapp`
 
 To view dapp:
@@ -30,6 +31,7 @@ To view dapp:
 ## Develop Server
 
 `npm run server`
+
 `truffle test ./test/oracles.js`
 
 ## Deploy

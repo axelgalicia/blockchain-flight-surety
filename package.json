@@ -1,7 +1,7 @@
 {
   "name": "flightsurety",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Blockchain Application to control Flight Surety for delay flights",
   "directories": {
     "test": "test"
   },
