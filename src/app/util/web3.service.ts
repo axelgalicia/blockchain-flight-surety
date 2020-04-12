@@ -3,7 +3,8 @@ import { default as Web3 } from 'web3';
 import { default as contract } from 'truffle-contract';
 
 import { WindowRefService } from './window-ref.service';
-import metacoin_artifacts from '../../../build/contracts/MetaCoin.json';
+import flight_surety_app_artifacts from '../../../build/contracts/FlightSuretyApp.json';
+import flight_surety_data_artifacts from '../../../build/contracts/FlightSuretyData.json';
 import { Subject } from 'rxjs';
 
 @Injectable()
@@ -11,7 +12,6 @@ export class Web3Service {
 
   private web3: Web3;
   private accounts: string[];
-  public MetaCoin: any;
   public FlightSuretyApp: any;
   public FlightSuretyData: any;
 
@@ -34,8 +34,12 @@ export class Web3Service {
 
   private setupMetacoinContract() {
     this.setupMetamaskWeb3();
-    this.MetaCoin = contract(metacoin_artifacts);
-    this.MetaCoin.setProvider(this.web3.currentProvider);
+    
+    this.FlightSuretyApp = contract(flight_surety_app_artifacts);
+    this.FlightSuretyData = contract(flight_surety_data_artifacts);
+
+    this.FlightSuretyApp.setProvider(this.web3.currentProvider);
+    this.FlightSuretyData.setProvider(this.web3.currentProvider);
   }
 
   private refreshAccounts() {
