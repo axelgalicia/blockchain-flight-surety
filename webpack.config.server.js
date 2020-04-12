@@ -6,7 +6,7 @@ const StartServerPlugin = require('start-server-webpack-plugin')
 module.exports = {
     entry: [
         'webpack/hot/poll?1000',
-        './src/server/index'
+        './oracles/index'
     ],
     watch: true,
     target: 'node',

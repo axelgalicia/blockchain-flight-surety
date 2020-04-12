@@ -7,7 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { ToastrModule } from 'ngx-toastr';
-import { ToastService } from './util/toast.service';
+import { ToastService } from './common/components/toast.service';
 import { Web3Service } from './common/services/web3.service';
 
 @NgModule({

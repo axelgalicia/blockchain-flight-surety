@@ -1,4 +1,4 @@
-pragma solidity 0.6.3;
+pragma solidity ^0.6.4;
 
 // It's important to avoid vulnerabilities due to numeric overflow bugs
 // OpenZeppelin's SafeMath library, when used correctly, protects agains such bugs
