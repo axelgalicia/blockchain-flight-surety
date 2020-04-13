@@ -5,21 +5,30 @@ import { default as contract } from 'truffle-contract';
 import { WindowRefService } from './window-ref.service';
 import flight_surety_app_artifacts from '../../../build/contracts/FlightSuretyApp.json';
 import flight_surety_data_artifacts from '../../../build/contracts/FlightSuretyData.json';
-import { Subject } from 'rxjs';
+import { Subject, interval } from 'rxjs';
+import { accessSync } from 'fs';
+import { ToastService } from './toast.service';
 
 @Injectable()
 export class Web3Service {
 
   private web3: Web3;
+  private web3Configured = false;
   private accounts: string[];
   public FlightSuretyApp: any;
   public FlightSuretyData: any;
 
-  public accountsObservable = new Subject<string[]>();
+  private currentAccountSource = new Subject<string>();
+  public currentAccount$ = this.currentAccountSource.asObservable();
+  private refreshAccountInterval$;
 
-  constructor(private windowRef: WindowRefService) {
-    this.setupMetacoinContract();
-    this.refreshAccounts();
+  constructor(private windowRef: WindowRefService,
+    private toastService: ToastService) {
+    this.setupContracts();
+    this.refreshAccountInterval$ = interval(500).subscribe(x => {
+      this.refreshAccounts();
+    });
+
   }
 
   private setupMetamaskWeb3() {
@@ -27,14 +36,22 @@ export class Web3Service {
       throw new Error('Can not get the window');
     }
     if (!this.windowRef.nativeWindow.web3) {
-      throw new Error('Not a metamask browser');
+      const msg = 'Not a metamask browser';
+      this.setCurrentAccount('Not connected');
+      this.toastService.showError(msg, 'Connection Error');
+      return;
     }
     this.web3 = new Web3(this.windowRef.nativeWindow.web3.currentProvider);
+    this.web3Configured = true;
   }
 
-  private setupMetacoinContract() {
+  private setupContracts() {
     this.setupMetamaskWeb3();
-    
+
+    if (!this.web3Configured) {
+      return;
+    }
+
     this.FlightSuretyApp = contract(flight_surety_app_artifacts);
     this.FlightSuretyData = contract(flight_surety_data_artifacts);
 
@@ -42,24 +59,30 @@ export class Web3Service {
     this.FlightSuretyData.setProvider(this.web3.currentProvider);
   }
 
-  private refreshAccounts() {
-    this.web3.eth.getAccounts((err, accs) => {
-      if (err != null) {
-        alert(`There was an error fetching your accounts.`);
-        return;
-      }
+  private async refreshAccounts() {
 
-      // Get the initial account balance so it can be displayed.
-      if (accs.length == 0) {
-        alert(`Couldn't get any accounts! Make sure your Ethereum client is configured correctly.`);
-        return;
-      }
+    if (!this.web3Configured) {
+      return;
+    }
 
-      if (!this.accounts || this.accounts.length != accs.length || this.accounts[0] != accs[0]) {
-        console.log(`Observed new accounts`);
-        this.accountsObservable.next(accs);
-        this.accounts = accs;
+    let accs = await this.web3.eth.getAccounts();
+    if (!accs[0]) {
+      accs = await this.windowRef.nativeWindow.web3.currentProvider.enable();
+    }
+
+    if (!this.accounts || this.accounts[0] !== accs[0]) {
+      this.setCurrentAccount(accs[0]);
+      if (!this.accounts) {
+        this.toastService.showSuccess('Ethereum client connected', 'Connection Status');
+      } else {
+        this.toastService.showSuccess('Address updated', 'Connection Status');
       }
-    });
+      this.accounts = accs;
+    }
   }
+
+  private setCurrentAccount(account: string) {
+    this.currentAccountSource.next(account)
+  }
+
 }

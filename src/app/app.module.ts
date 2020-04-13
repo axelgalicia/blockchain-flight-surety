@@ -7,6 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { ToastrModule } from 'ngx-toastr';
+import { UtilModule } from './util/util.module';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,7 @@ import { ToastrModule } from 'ngx-toastr';
     BrowserAnimationsModule,
     MatToolbarModule,
     MatIconModule,
-    ToastrModule.forRoot()
+    UtilModule
   ],
   providers: [],
   bootstrap: [AppComponent]

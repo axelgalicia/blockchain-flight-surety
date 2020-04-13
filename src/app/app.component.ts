@@ -1,28 +1,39 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { ToastService } from './util/toast.service';
 import { Web3Service } from './util/web3.service';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 
   title: string;
-  // Ethereum Address for the current account
+
+  // Current selected Address
   currentAccount: string;
+  // Subscriptions
+  currentAccount$: Subscription;
 
   constructor(private web3Service: Web3Service,
     private toastService: ToastService) {
     this.title = 'Flight Surety App';
-    this.currentAccount = '0xa5bc6a5b6cb656ba575bc76b5a6';
+    this.currentAccount$ = this.web3Service.currentAccount$.subscribe((currAccount: string) => {
+      this.currentAccount = currAccount;
+      console.log('ACCOUNT:', currAccount);
+    });
+
   }
 
 
-  async ngOnInit() {
-     //const accounts = await this.web3.currentProvider.getAccounts();
-     //console.log(accounts);
+  ngOnInit() {
+
+  }
+
+  ngOnDestroy() {
+    this.currentAccount$.unsubscribe();
   }
 
 

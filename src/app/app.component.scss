@@ -1,12 +1,17 @@
-@import '~ngx-toastr/toastr';
 
 .toolbar-row {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    font-weight: 400;
+    font-weight: 300;
 
-    .current-account {
-        font-size: 14px;
+    .plane {
+        margin-right: 20px;
+        font-size: 36px;
+    }
+
+    .current-address {
+        font-weight: 300;
+        font-size: 20px;
     }
 }
