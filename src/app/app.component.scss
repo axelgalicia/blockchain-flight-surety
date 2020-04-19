@@ -15,3 +15,23 @@
         font-size: 20px;
     }
 }
+
+.operational-status {
+    align-items: center;
+    color: white;
+    display: flex;
+    font-size: 18px;
+    justify-content: center;
+    height: 30px;
+
+    &.active {
+        background-color: green;
+    }
+    &.paused {
+        background-color: grey;
+    }
+
+    &.disconnected {
+        background-color: red;
+    }
+}

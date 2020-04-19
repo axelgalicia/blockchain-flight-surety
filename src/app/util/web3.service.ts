@@ -1,34 +1,48 @@
-import { Injectable, OnInit, Output, EventEmitter } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { default as Web3 } from 'web3';
 import { default as contract } from 'truffle-contract';
-
-import { WindowRefService } from './window-ref.service';
+import { ContractName } from '../common/enums/contractName.enum';
+import { Contract } from "../common/interfaces/contract.interface";
+import { WindowReferenceService } from './windowReference.service';
 import flight_surety_app_artifacts from '../../../build/contracts/FlightSuretyApp.json';
 import flight_surety_data_artifacts from '../../../build/contracts/FlightSuretyData.json';
-import { Subject, interval } from 'rxjs';
-import { accessSync } from 'fs';
+import { Subject, interval, Subscription } from 'rxjs';
 import { ToastService } from './toast.service';
 
+
 @Injectable()
-export class Web3Service {
+export class Web3Service implements OnDestroy {
 
   private web3: Web3;
   private web3Configured = false;
   private accounts: string[];
-  public FlightSuretyApp: any;
-  public FlightSuretyData: any;
+  // Contracts
+  private FlightSuretyApp: any;
+  private FlightSuretyData: any;
 
+  // Deployed Contracts
+  deployedContracts = new Map<ContractName, Contract>();
+  deployedContractsSource = new Subject<Map<ContractName, Contract>>();
+  deployedContracts$ = this.deployedContractsSource.asObservable();
+
+  // Current Metamask Account
   private currentAccountSource = new Subject<string>();
   public currentAccount$ = this.currentAccountSource.asObservable();
-  private refreshAccountInterval$;
 
-  constructor(private windowRef: WindowRefService,
+  // Interval to refresh current Metamask account
+  private refreshAccountInterval$: Subscription;
+
+  constructor(private windowRef: WindowReferenceService,
     private toastService: ToastService) {
     this.setupContracts();
-    this.refreshAccountInterval$ = interval(500).subscribe(x => {
+    this.refreshAccountInterval$ = interval(100).subscribe(x => {
       this.refreshAccounts();
     });
 
+  }
+
+  ngOnDestroy() {
+    this.refreshAccountInterval$.unsubscribe();
   }
 
   private setupMetamaskWeb3() {
@@ -45,7 +59,7 @@ export class Web3Service {
     this.web3Configured = true;
   }
 
-  private setupContracts() {
+  private async setupContracts() {
     this.setupMetamaskWeb3();
 
     if (!this.web3Configured) {
@@ -57,6 +71,21 @@ export class Web3Service {
 
     this.FlightSuretyApp.setProvider(this.web3.currentProvider);
     this.FlightSuretyData.setProvider(this.web3.currentProvider);
+
+    this.FlightSuretyApp = await this.FlightSuretyApp.deployed();
+    this.FlightSuretyData = await this.FlightSuretyData.deployed();
+
+    this.updateContracts([
+      {
+        name: ContractName.FLIGHT_SURETY_APP,
+        contract: this.FlightSuretyApp
+      },
+      {
+        name: ContractName.FLIGHT_SURETY_DATA,
+        contract: this.FlightSuretyData
+      }
+    ]);
+
   }
 
   private async refreshAccounts() {
@@ -81,8 +110,17 @@ export class Web3Service {
     }
   }
 
+  // Publish the new current account
   private setCurrentAccount(account: string) {
     this.currentAccountSource.next(account)
+  }
+
+  // Publish a new version of a contract
+  private updateContracts(contracts: Contract[]) {
+    contracts.forEach((contract: Contract) => {
+      this.deployedContracts.set(contract.name, contract);
+    });
+    this.deployedContractsSource.next(this.deployedContracts);
   }
 
 }

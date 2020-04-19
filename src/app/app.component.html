@@ -2,13 +2,18 @@
     <mat-toolbar-row class="toolbar-row">
         <div>
             <mat-icon aria-hidden="false" class="plane">flight</mat-icon>
-            <span>{{title}}</span>
+            <span>Flight Surety App</span>
         </div>
         <div>
-            <span class="current-address">Address:  {{currentAccount}}</span>
+            <span class="current-address">Address: {{currentAccount}}</span>
         </div>
     </mat-toolbar-row>
 </mat-toolbar>
+
+<!-- Operational Status bar -->
+<div class="operational-status" [ngClass]="statusclass">
+    <span>Operational status: {{operationalStatus}}</span>
+</div>
 
 
 <!-- <router-outlet></router-outlet> -->
