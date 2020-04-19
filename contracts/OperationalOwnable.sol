@@ -8,6 +8,9 @@ contract OperationalOwnable {
     address payable private contractOwner;
 
     // Define an Event
+    event UpdateOperationalStatus(bool mode);
+
+    // Define an Event
     event TransferOwnership(address indexed oldOwner, address indexed newOwner);
 
     // Assign the contract to an owner
@@ -44,6 +47,7 @@ contract OperationalOwnable {
      */
 
     function setOperatingStatus(bool mode) external onlyOwner {
+        emit UpdateOperationalStatus(mode);
         operational = mode;
     }
 

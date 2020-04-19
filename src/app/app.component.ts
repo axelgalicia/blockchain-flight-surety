@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { ToastService } from './util/toast.service';
 import { Web3Service } from './util/web3.service';
-import { Subscription } from 'rxjs';
+import { Subscription, interval } from 'rxjs';
 import { OperationalStatus } from './common/enums/operationalStatus.enum';
 import { Contract } from "./common/interfaces/contract.interface";
 import { ContractName } from "./common/enums/contractName.enum";
@@ -33,18 +33,35 @@ export class AppComponent implements OnInit, OnDestroy {
   FlightSuretyApp: Contract;
   FlightSuretyData: Contract;
 
+
+  interval$: Subscription;
+
   constructor(private web3Service: Web3Service,
     private toastService: ToastService) {
 
-    this.currentAccount$ = this.web3Service.currentAccount$.subscribe((currAccount: string) => {
+    // Listens for new Metamask Address
+    this.currentAccount$ = this.web3Service.currentAccount$.subscribe(async (currAccount: string) => {
       this.currentAccount = currAccount;
+
     });
 
-    this.deployedContracts$ = this.web3Service.deployedContracts$.subscribe((deployedContracts: Map<ContractName, any>) => {
-        this.FlightSuretyApp = deployedContracts.get(ContractName.FLIGHT_SURETY_APP);
-        this.FlightSuretyData = deployedContracts.get(ContractName.FLIGHT_SURETY_DATA);
-        this.updateOperationalStatus();
+    // Listens for deployed contracts
+    this.deployedContracts$ = this.web3Service.deployedContracts$.subscribe(async (deployedContracts: Map<ContractName, any>) => {
+      this.FlightSuretyApp = deployedContracts.get(ContractName.FLIGHT_SURETY_APP);
+      this.FlightSuretyData = deployedContracts.get(ContractName.FLIGHT_SURETY_DATA);
+      this.updateOperationalStatus();
+      this.interval$ = interval(10000).subscribe(async i => {
+        console.log(i);
+        const flag = this.operationalStatus === OperationalStatus.ACTIVE ? false : true;
+        this.FlightSuretyData.contract.setOperatingStatus(flag, { from: this.currentAccount }).then(result => {
+          console.log(result.logs[0].args[0]);
+          this.updateOperationalStatus();
+        });
+      });
+
     });
+
+
 
   }
 
@@ -55,6 +72,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.currentAccount$.unsubscribe();
     this.deployedContracts$.unsubscribe();
+    this.interval$.unsubscribe();
   }
 
   async updateOperationalStatus() {
