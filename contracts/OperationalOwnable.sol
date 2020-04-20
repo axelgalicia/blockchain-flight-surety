@@ -46,7 +46,7 @@ contract OperationalOwnable {
      * When operational mode is disabled, all write transactions except for this one will fail
      */
 
-    function setOperatingStatus(bool mode) external onlyOwner {
+    function setOperationalStatus(bool mode) external onlyOwner {
         emit UpdateOperationalStatus(mode);
         operational = mode;
     }

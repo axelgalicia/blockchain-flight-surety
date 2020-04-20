@@ -6,12 +6,13 @@
         </div>
         <div>
             <span class="current-address">Address: {{currentAccount}}</span>
+            <span class="balance">Balance: {{currentAccountBalance}} ETH</span>
         </div>
     </mat-toolbar-row>
 </mat-toolbar>
 
 <!-- Operational Status bar -->
-<div class="operational-status" [ngClass]="statusclass">
+<div class="operational-status" [ngClass]="statusclass" (click)="updateStatus()">
     <span>Operational status: {{operationalStatus}}</span>
 </div>
 
