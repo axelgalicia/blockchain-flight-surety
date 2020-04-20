@@ -4,10 +4,10 @@
             <mat-icon aria-hidden="false" class="plane">flight</mat-icon>
             <span>Flight Surety App</span>
         </div>
-        <div>
-            <span class="current-address">Address: {{currentAccount}}</span>
-            <span class="balance">Balance: {{currentAccountBalance}} ETH</span>
-        </div>
+
+        <div class="current-address">Address: {{currentAccount}}</div>
+        <div class="balance">Balance: {{currentAccountBalance}} ETH</div>
+
     </mat-toolbar-row>
 </mat-toolbar>
 
@@ -16,5 +16,5 @@
     <span>Operational status: {{operationalStatus}}</span>
 </div>
 
-
 <!-- <router-outlet></router-outlet> -->
+<app-transaction-log></app-transaction-log>

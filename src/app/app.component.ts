@@ -55,13 +55,13 @@ export class AppComponent implements OnInit, OnDestroy {
     this.currentAccount$ = this.web3Service.currentAccount$.subscribe((currAccount: string) => {
       this.currentAccount = currAccount;
       this.updateAccountBalance(this.currentAccount);
+      this.updateOperationalStatus();
     });
 
     // Listens for deployed contracts
     this.deployedContracts$ = this.web3Service.deployedContracts$.subscribe(async (deployedContracts: Map<ContractName, any>) => {
       this.FlightSuretyApp = deployedContracts.get(ContractName.FLIGHT_SURETY_APP);
       this.FlightSuretyData = deployedContracts.get(ContractName.FLIGHT_SURETY_DATA);
-      this.updateOperationalStatus();
     });
 
     // Listens for Tx Logs

@@ -8,7 +8,7 @@ import { ToastrModule } from 'ngx-toastr';
   imports: [
     CommonModule,
     ToastrModule.forRoot({
-      positionClass: 'toast-top-center',
+      positionClass: 'toast-bottom-center',
     })
   ],
   providers: [
