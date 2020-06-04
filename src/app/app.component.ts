@@ -54,7 +54,7 @@ export class AppComponent implements OnInit, OnDestroy {
     // Listens for new Metamask Address
     this.currentAccount$ = this.web3Service.currentAccount$.subscribe((currAccount: string) => {
       this.currentAccount = currAccount;
-      this.updateAccountBalance(this.currentAccount);
+      this.updateAccountBalance(currAccount);
       this.updateOperationalStatus();
     });
 
@@ -74,6 +74,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   async updateAccountBalance(address: string) {
+    if (address === null) {
+      this.currentAccountBalance = '';
+      return;
+    }
     const weiBalance = await this.web3.eth.getBalance(address);
     this.currentAccountBalance = this.web3.utils.fromWei(weiBalance, 'ether');
   }
@@ -96,8 +100,20 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   async updateOperationalStatus() {
-    const isActive = await this.FlightSuretyApp.instance.isOperational() && await this.FlightSuretyData.instance.isOperational();
-    this.operationalStatus = isActive ? OperationalStatus.ACTIVE : OperationalStatus.PAUSED;
+    if (this.currentAccount === null) {
+      this.statusclass = this.getStatusClass(OperationalStatus.DISCONNECTED);
+      this.operationalStatus = OperationalStatus.DISCONNECTED;
+      return;
+    }
+
+    try {
+      const isActive = await this.FlightSuretyApp.instance.isOperational()
+        && await this.FlightSuretyData.instance.isOperational();
+      this.operationalStatus = isActive ? OperationalStatus.ACTIVE : OperationalStatus.PAUSED;
+    } catch (e) {
+      this.operationalStatus = OperationalStatus.DISCONNECTED;
+    }
+
     this.statusclass = this.getStatusClass(this.operationalStatus);
   }
 

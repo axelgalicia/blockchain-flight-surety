@@ -78,7 +78,7 @@ export class Web3Service implements OnDestroy {
     if (!this.web3Configured) {
       return;
     }
-    
+
     // Create Contract object from ABI JSON object
     this.FlightSuretyApp = contract(flight_surety_app_artifacts);
     this.FlightSuretyData = contract(flight_surety_data_artifacts);
@@ -106,6 +106,10 @@ export class Web3Service implements OnDestroy {
 
   }
 
+  private async isMetamaskUnlocked() {
+    return await this.windowRef.nativeWindow.web3.currentProvider._metamask.isUnlocked();
+  }
+
   listenForTxLogs() {
     this.txLogsSubscription$ = this.web3.eth.subscribe('logs', {}, (error, log) => { })
       .on("data", (log) => {
@@ -120,8 +124,9 @@ export class Web3Service implements OnDestroy {
 
 
   private async refreshAccounts() {
-
-    if (!this.web3Configured) {
+    const isMetamaskUnblocked = await this.isMetamaskUnlocked();
+    if (!this.web3Configured || !isMetamaskUnblocked) {
+      this.setCurrentAccount(null);
       return;
     }
 
