@@ -1,13 +1,12 @@
 <h2>Transactions Log</h2>
-<div class="tx-container">
-    <div>Address:</div>
-    <span>blockHash:</span>
-    <span>blockNumber:</span>
-    <span>data:</span>
-    <span>logIndex:</span>
-    <span>topics:</span>
-    <span>transactionHash:</span>
-    <span>transactionIndex:</span>
-    <span>type:</span>
-    
+<div *ngFor="let log of txLog" class="tx-container">
+    <div><b>Address:</b> {{log.address}}</div>
+    <div><b>blockHash:</b> {{log.blockHash}}</div>
+    <div><b>blockNumber:</b> {{log.blockNumber}}</div>
+    <div><b>data:</b> {{log.data}}</div>
+    <div><b>logIndex:</b> {{log.logIndex}}</div>
+    <div><b>topics:</b> {{log.topics}}</div>
+    <div><b>transactionHash:</b> {{log.transactionHash}}</div>
+    <div><b>transactionIndex:</b> {{log.transactionIndex}}</div>
+    <div><b>type:</b> {{log.type}}</div>
 </div>

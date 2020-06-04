@@ -31,7 +31,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // Subscriptions
   private currentAccount$: Subscription;
-  private txLogs$: Subscription;
 
   // Contracts
   private deployedContracts$: Subscription;
@@ -62,14 +61,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.deployedContracts$ = this.web3Service.deployedContracts$.subscribe(async (deployedContracts: Map<ContractName, any>) => {
       this.FlightSuretyApp = deployedContracts.get(ContractName.FLIGHT_SURETY_APP);
       this.FlightSuretyData = deployedContracts.get(ContractName.FLIGHT_SURETY_DATA);
+      this.updateStatus();
     });
-
-    // Listens for Tx Logs
-    this.txLogs$ = this.web3Service.txLogs$.subscribe((log: Log) => {
-      console.log(log);
-    });
-
-
 
   }
 
@@ -95,14 +88,13 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.currentAccount$.unsubscribe();
     this.deployedContracts$.unsubscribe();
-    this.txLogs$.unsubscribe();
     this.web3$.unsubscribe();
   }
 
   async updateOperationalStatus() {
     if (this.currentAccount === null) {
-      this.statusclass = this.getStatusClass(OperationalStatus.DISCONNECTED);
       this.operationalStatus = OperationalStatus.DISCONNECTED;
+      this.statusclass = this.getStatusClass(OperationalStatus.DISCONNECTED);
       return;
     }
 

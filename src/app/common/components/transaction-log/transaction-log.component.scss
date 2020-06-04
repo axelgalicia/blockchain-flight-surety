@@ -1,13 +1,17 @@
 h2 {
-    
+    margin-top: 10px;
+    text-align: center;
 }
 
 .tx-container {
-    background-color: black;
+    background-color: rgb(53, 53, 53);
+    border-radius: 20px;
+    font-family: Roboto;
     color: white;
-    display: inline-block;
+    display: block;
     justify-content: left;
-    width: 25%;
-    padding: 10px;
+    width: 95%;
+    padding: 20px;
+    margin-left: 10px;
 
 }

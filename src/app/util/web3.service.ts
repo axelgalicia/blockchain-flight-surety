@@ -22,8 +22,8 @@ export class Web3Service implements OnDestroy {
   private FlightSuretyData: any;
 
   // Deployed Contracts
-  deployedContracts = new Map<ContractName, Contract>();
-  deployedContractsSource = new Subject<Map<ContractName, Contract>>();
+  private deployedContracts = new Map<ContractName, Contract>();
+  private deployedContractsSource = new Subject<Map<ContractName, Contract>>();
   deployedContracts$ = this.deployedContractsSource.asObservable();
 
   // Current Metamask Account
@@ -31,9 +31,9 @@ export class Web3Service implements OnDestroy {
   public currentAccount$ = this.currentAccountSource.asObservable();
 
   // Tx Logs
-  private txLogsSource = new Subject<Log>();
-  private txLogsSubscription$: any;
-  txLogs$ = this.txLogsSource.asObservable();
+  private txLogSource = new Subject<Log>();
+  private txLogSubscription$: any;
+  txLog$ = this.txLogSource.asObservable();
 
   // Web3 Object
   private web3Source = new BehaviorSubject<any>(null);
@@ -54,7 +54,7 @@ export class Web3Service implements OnDestroy {
   ngOnDestroy() {
     this.refreshAccountInterval$.unsubscribe();
     // Web3 Subscription type
-    this.txLogsSubscription$.unsubscribe();
+    this.txLogSubscription$.unsubscribe();
   }
 
   private setupMetamaskWeb3() {
@@ -111,9 +111,9 @@ export class Web3Service implements OnDestroy {
   }
 
   listenForTxLogs() {
-    this.txLogsSubscription$ = this.web3.eth.subscribe('logs', {}, (error, log) => { })
-      .on("data", (log) => {
-        this.txLogsSource.next(log);
+    this.txLogSubscription$ = this.web3.eth.subscribe('logs', {}, (error, log) => { })
+      .on("data", (log: Log) => {
+        this.txLogSource.next(log);
       })
       .on("error", (error) => {
         this.toastService.showError('There was an error with the transaction, please try again.', 'Transaction')
