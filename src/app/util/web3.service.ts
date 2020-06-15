@@ -45,7 +45,7 @@ export class Web3Service implements OnDestroy {
   constructor(private windowRef: WindowReferenceService,
     private toastService: ToastService) {
     this.setupContracts();
-    this.refreshAccountInterval$ = interval(100).subscribe(x => {
+    this.refreshAccountInterval$ = interval(1000).subscribe(x => {
       this.refreshAccounts();
     });
 
@@ -124,13 +124,16 @@ export class Web3Service implements OnDestroy {
 
 
   private async refreshAccounts() {
+
     const isMetamaskUnblocked = await this.isMetamaskUnlocked();
     if (!this.web3Configured || !isMetamaskUnblocked) {
       this.setCurrentAccount(null);
+      this.accounts = [];
       return;
     }
 
     let accs = await this.web3.eth.getAccounts();
+
     if (!accs[0]) {
       accs = await this.windowRef.nativeWindow.web3.currentProvider.enable();
     }

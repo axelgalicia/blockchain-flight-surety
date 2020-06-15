@@ -55,13 +55,14 @@ export class AppComponent implements OnInit, OnDestroy {
       this.currentAccount = currAccount;
       this.updateAccountBalance(currAccount);
       this.updateOperationalStatus();
+      this.updateStatus();
     });
 
     // Listens for deployed contracts
     this.deployedContracts$ = this.web3Service.deployedContracts$.subscribe(async (deployedContracts: Map<ContractName, any>) => {
       this.FlightSuretyApp = deployedContracts.get(ContractName.FLIGHT_SURETY_APP);
       this.FlightSuretyData = deployedContracts.get(ContractName.FLIGHT_SURETY_DATA);
-      this.updateStatus();
+    
     });
 
   }
@@ -77,6 +78,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public updateStatus() {
     this.FlightSuretyData.instance.setOperationalStatus(true, { from: this.currentAccount }).catch(error => {
+      console.log(error);
       console.log('Rejected');
     });
   }
