@@ -1,0 +1,30 @@
+<h1>Admin Module</h1>
+
+
+<!-- CONTRACTS -->
+<mat-card class="contracts">
+    <mat-card-header>
+        <mat-card-title>Contracts</mat-card-title>
+        <mat-card-subtitle>Operational status</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+        <form class="form-contracts" [formGroup]="contractsForm">
+            <div>
+                <mat-form-field class="field">
+                    <mat-label>Data Contract</mat-label>
+                    <input matInput placeholder="Data contract address" value="{{isDataOperational}}">
+                </mat-form-field>
+                <mat-slide-toggle formControlName="isDataOperational">Is Operational</mat-slide-toggle>
+            </div>
+
+            <div>
+                <mat-form-field class="field">
+                    <mat-label>App contract</mat-label>
+                    <input matInput placeholder="App contract address" value="0x0aba56ab67ab765a675ab76ab5">
+                </mat-form-field>
+                <mat-slide-toggle formControlName="isAppOperational">Is Operational</mat-slide-toggle>
+            </div>
+
+        </form>
+    </mat-card-content>
+</mat-card>

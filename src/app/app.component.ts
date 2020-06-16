@@ -4,7 +4,8 @@ import { Web3Service } from './util/web3.service';
 import { Subscription } from 'rxjs';
 import { OperationalStatus } from './common/enums/operationalStatus.enum';
 import { Contract } from "./common/interfaces/contract.interface";
-import { ContractName } from "./common/enums/contractName.enum";
+import { ContractName } from './common/enums/contractName.enum';
+import { AppService } from './common/services/app.service';
 import { Log } from './common/interfaces/log.interface';
 
 
@@ -42,6 +43,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private web3: any;
 
   constructor(private web3Service: Web3Service,
+    appService: AppService,
     private toastService: ToastService) {
 
 
@@ -55,7 +57,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.currentAccount = currAccount;
       this.updateAccountBalance(currAccount);
       this.updateOperationalStatus();
-      this.updateStatus();
+      // this.updateStatus();
     });
 
     // Listens for deployed contracts
