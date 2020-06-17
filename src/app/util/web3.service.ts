@@ -14,6 +14,8 @@ import { ToastService } from './toast.service';
 @Injectable()
 export class Web3Service implements OnDestroy {
 
+  private subs = new Subscription();
+
   private web3: Web3;
   private web3Configured = false;
   private accounts: string[];
@@ -23,38 +25,31 @@ export class Web3Service implements OnDestroy {
 
   // Deployed Contracts
   private deployedContracts = new Map<ContractName, Contract>();
-  private deployedContractsSource = new Subject<Map<ContractName, Contract>>();
+  private deployedContractsSource = new BehaviorSubject<Map<ContractName, Contract>>(null);
   deployedContracts$ = this.deployedContractsSource.asObservable();
 
   // Current Metamask Account
-  private currentAccountSource = new Subject<string>();
-  public currentAccount$ = this.currentAccountSource.asObservable();
+  private currentAccountSource = new BehaviorSubject<string>(null);
+  currentAccount$ = this.currentAccountSource.asObservable();
 
   // Tx Logs
   private txLogSource = new Subject<Log>();
-  private txLogSubscription$: any;
   txLog$ = this.txLogSource.asObservable();
 
   // Web3 Object
   private web3Source = new BehaviorSubject<any>(null);
   web3$ = this.web3Source.asObservable();
 
-  // Interval to refresh current Metamask account
-  private refreshAccountInterval$: Subscription;
-
   constructor(private windowRef: WindowReferenceService,
     private toastService: ToastService) {
     this.setupContracts();
-    this.refreshAccountInterval$ = interval(1000).subscribe(x => {
+    this.subs.add(interval(1000).subscribe(x => {
       this.refreshAccounts();
-    });
-
+    }));
   }
 
   ngOnDestroy() {
-    this.refreshAccountInterval$.unsubscribe();
-    // Web3 Subscription type
-    this.txLogSubscription$.unsubscribe();
+    this.subs.unsubscribe();
   }
 
   private setupMetamaskWeb3() {
@@ -111,14 +106,14 @@ export class Web3Service implements OnDestroy {
   }
 
   listenForTxLogs() {
-    this.txLogSubscription$ = this.web3.eth.subscribe('logs', {}, (error, log) => { })
+    this.subs.add(this.web3.eth.subscribe('logs', {}, (error, log) => { })
       .on("data", (log: Log) => {
         this.txLogSource.next(log);
       })
       .on("error", (error) => {
         this.toastService.showError('There was an error with the transaction, please try again.', 'Transaction')
         console.log(error);
-      });
+      }));
 
   }
 

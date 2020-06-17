@@ -1,12 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ToastService } from './util/toast.service';
-import { Web3Service } from './util/web3.service';
 import { Subscription } from 'rxjs';
 import { OperationalStatus } from './common/enums/operationalStatus.enum';
 import { Contract } from "./common/interfaces/contract.interface";
 import { ContractName } from './common/enums/contractName.enum';
-import { AppService } from './common/services/app.service';
-import { Log } from './common/interfaces/log.interface';
+import { BlockchainService } from './common/services/blockchain.service';
 
 
 export enum StatusClasses {
@@ -22,51 +20,52 @@ export enum StatusClasses {
 })
 export class AppComponent implements OnInit, OnDestroy {
 
-  // Current Address
-  currentAccount: string;
-  currentAccountBalance: string;
+  // Subscriptions
+  private subs = new Subscription();
+
+  // Public contracts
+  public FlightSuretyApp: Contract;
+  public FlightSuretyData: Contract;
 
   //  Operational status
   operationalStatus = OperationalStatus.DISCONNECTED;
   statusclass = StatusClasses.DISCONNECTED;
 
-  // Subscriptions
-  private currentAccount$: Subscription;
+  currentAccountBalance: string;
+  currentAccount: string;
 
-  // Contracts
-  private deployedContracts$: Subscription;
-  private FlightSuretyApp: Contract;
-  private FlightSuretyData: Contract;
-
-  // Web3 Object
-  private web3$: Subscription;
   private web3: any;
 
-  constructor(private web3Service: Web3Service,
-    appService: AppService,
+  constructor(private blockchainService: BlockchainService,
     private toastService: ToastService) {
+    this.listenForWeb3();
+  }
 
-
-    // Assigns the current Web3 Object
-    this.web3$ = this.web3Service.web3$.subscribe((web3: any) => {
-      this.web3 = web3;
-    });
-
+  private listenForAccount(): void {
     // Listens for new Metamask Address
-    this.currentAccount$ = this.web3Service.currentAccount$.subscribe((currAccount: string) => {
+    this.subs.add(this.blockchainService.currentAccount$.subscribe((currAccount: string) => {
       this.currentAccount = currAccount;
       this.updateAccountBalance(currAccount);
+      this.listenForContracts();
       this.updateOperationalStatus();
-      // this.updateStatus();
-    });
+    }));
+  }
 
-    // Listens for deployed contracts
-    this.deployedContracts$ = this.web3Service.deployedContracts$.subscribe(async (deployedContracts: Map<ContractName, any>) => {
+  private listenForWeb3(): void {
+    this.subs.add(this.blockchainService.web3$.subscribe((web3: any) => {
+      this.web3 = web3;
+      this.listenForAccount();
+    }));
+  }
+
+  private listenForContracts(): void {
+    this.blockchainService.deployedContracts$.subscribe((deployedContracts: Map<ContractName, any>) => {
+      if (deployedContracts === null) {
+        return;
+      }
       this.FlightSuretyApp = deployedContracts.get(ContractName.FLIGHT_SURETY_APP);
       this.FlightSuretyData = deployedContracts.get(ContractName.FLIGHT_SURETY_DATA);
-    
     });
-
   }
 
   async updateAccountBalance(address: string) {
@@ -78,21 +77,19 @@ export class AppComponent implements OnInit, OnDestroy {
     this.currentAccountBalance = this.web3.utils.fromWei(weiBalance, 'ether');
   }
 
-  public updateStatus() {
-    this.FlightSuretyData.instance.setOperationalStatus(true, { from: this.currentAccount }).catch(error => {
-      console.log(error);
-      console.log('Rejected');
-    });
-  }
+  // public updateStatus() {
+  //   this.FlightSuretyData.instance.setOperationalStatus(true, { from: this.currentAccount }).catch(error => {
+  //     console.log(error);
+  //     console.log('Rejected');
+  //   });
+  // }
 
 
   ngOnInit() {
   }
 
   ngOnDestroy() {
-    this.currentAccount$.unsubscribe();
-    this.deployedContracts$.unsubscribe();
-    this.web3$.unsubscribe();
+    this.subs.unsubscribe();
   }
 
   async updateOperationalStatus() {

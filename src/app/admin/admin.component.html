@@ -12,7 +12,7 @@
             <div>
                 <mat-form-field class="field">
                     <mat-label>Data Contract</mat-label>
-                    <input matInput placeholder="Data contract address" value="{{isDataOperational}}">
+                    <input matInput placeholder="Data contract address" value="{{dataContractAddress}}">
                 </mat-form-field>
                 <mat-slide-toggle formControlName="isDataOperational">Is Operational</mat-slide-toggle>
             </div>
@@ -20,7 +20,7 @@
             <div>
                 <mat-form-field class="field">
                     <mat-label>App contract</mat-label>
-                    <input matInput placeholder="App contract address" value="0x0aba56ab67ab765a675ab76ab5">
+                    <input matInput placeholder="App contract address" value="{{appContractAddress}}">
                 </mat-form-field>
                 <mat-slide-toggle formControlName="isAppOperational">Is Operational</mat-slide-toggle>
             </div>

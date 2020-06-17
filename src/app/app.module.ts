@@ -18,7 +18,7 @@ import { CommonComponentsModule } from './common/components/common-components.mo
 import { AdminComponent } from './admin/admin.component';
 import { AirlinesComponent } from './airlines/airlines.component';
 import { PassengerComponent } from './passenger/passenger.component';
-import { AppService } from './common/services/app.service';
+import { BlockchainService } from './common/services/blockchain.service';
 
 @NgModule({
   declarations: [
@@ -42,7 +42,7 @@ import { AppService } from './common/services/app.service';
     UtilModule,
     CommonComponentsModule
   ],
-  providers: [AppService],
+  providers: [BlockchainService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
