@@ -6,6 +6,7 @@ import { BlockchainService } from '../common/services/blockchain.service';
 import { OperationalStatus } from '../common/enums/operationalStatus.enum';
 import { Contract } from "../common/interfaces/contract.interface";
 import { ContractName } from '../common/enums/contractName.enum';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle/slide-toggle';
 
 @Component({
   selector: 'app-admin',
@@ -33,10 +34,6 @@ export class AdminComponent implements OnInit, OnDestroy {
 
     this.initForms();
     this.listenForContracts();
-
-    interval(20000).subscribe(x => {
-      this.updateAppStatus(!this.isAppOperational);
-    });
   }
 
   ngOnInit(): void {
@@ -62,7 +59,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       this.FlightSuretyApp = deployedContracts.get(ContractName.FLIGHT_SURETY_APP);
       this.FlightSuretyData = deployedContracts.get(ContractName.FLIGHT_SURETY_DATA);
       this.listenForCurrentAccount();
-
+      this.updateFormStatus();
     }));
   }
 
@@ -90,12 +87,28 @@ export class AdminComponent implements OnInit, OnDestroy {
     });
   }
 
-  public updateAppStatus(status: boolean) {
-    this.FlightSuretyData.instance.setOperationalStatus(status, { from: this.currentAccount }).catch(error => {
-      console.log(error);
-      console.log('Rejected');
-      this.updateFormStatus();
-    });
+  toggleDataContract(): void {
+    this.updateDataStatus(!this.isDataOperational);
+  }
+
+  toggleAppContract(): void {
+    this.updateAppStatus(!this.isAppOperational);
+  }
+
+  public async updateAppStatus(status: boolean) {
+    const obj = await this.FlightSuretyData.instance.setOperationalStatus(status, { from: this.currentAccount })
+      .catch((error: any) => {
+        console.log(error);
+      });
+   // this.updateFormStatus();
+  }
+
+  public async updateDataStatus(status: boolean) {
+    const obj = await this.FlightSuretyData.instance.setOperationalStatus(status, { from: this.currentAccount })
+      .catch((error: any) => {
+        console.log(error);
+      });
+   // this.updateFormStatus();
   }
 
 

@@ -65,7 +65,20 @@ export class AppComponent implements OnInit, OnDestroy {
       }
       this.FlightSuretyApp = deployedContracts.get(ContractName.FLIGHT_SURETY_APP);
       this.FlightSuretyData = deployedContracts.get(ContractName.FLIGHT_SURETY_DATA);
+      this.listenForEvents();
     });
+  }
+
+  private listenForEvents() {
+    this.FlightSuretyData.instance.UpdateOperationalStatus({})
+      .on('data', (event: any) => {
+        this.updateOperationalStatus();
+      });
+    this.FlightSuretyApp.instance.UpdateOperationalStatus({})
+      .on('data', (event: any) => {
+        this.updateOperationalStatus();
+      });
+
   }
 
   async updateAccountBalance(address: string) {
@@ -76,14 +89,6 @@ export class AppComponent implements OnInit, OnDestroy {
     const weiBalance = await this.web3.eth.getBalance(address);
     this.currentAccountBalance = this.web3.utils.fromWei(weiBalance, 'ether');
   }
-
-  // public updateStatus() {
-  //   this.FlightSuretyData.instance.setOperationalStatus(true, { from: this.currentAccount }).catch(error => {
-  //     console.log(error);
-  //     console.log('Rejected');
-  //   });
-  // }
-
 
   ngOnInit() {
   }

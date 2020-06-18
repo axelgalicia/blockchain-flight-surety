@@ -20,6 +20,9 @@ export class BlockchainService implements OnDestroy {
     private web3Source = new BehaviorSubject<any>(null);
     public web3$ = this.web3Source.asObservable();
 
+    private eventsSource = new BehaviorSubject<any>(null);
+    public events$ = this.eventsSource.asObservable();
+
     constructor(private web3Service: Web3Service) {
         console.log('blockchainService')
         this.listenToWeb3();
@@ -44,7 +47,6 @@ export class BlockchainService implements OnDestroy {
             this.currentAccountSource.next(currentAccount);
         });
     }
-
 
     ngOnDestroy() {
         this.subs.unsubscribe();
