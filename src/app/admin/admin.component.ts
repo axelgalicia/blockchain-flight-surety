@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { Subscription, interval } from 'rxjs';
+
+import { Subscription } from 'rxjs';
 import { BlockchainService } from '../common/services/blockchain.service';
-import { OperationalStatus } from '../common/enums/operationalStatus.enum';
 import { Contract } from "../common/interfaces/contract.interface";
 import { ContractName } from '../common/enums/contractName.enum';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle/slide-toggle';
+import { RegisteredFlight } from '../common/interfaces/registered-flight.interface';
+
 
 @Component({
   selector: 'app-admin',
@@ -28,6 +29,9 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   dataContractAddress: string;
   appContractAddress: string;
+
+  dataRgisteredFlights: RegisteredFlight[] = [];
+  displayedColumns: string[] = ['id', 'name', 'timestamp'];
 
   constructor(private formBuilder: FormBuilder,
     private blockchainService: BlockchainService) {
@@ -85,6 +89,9 @@ export class AdminComponent implements OnInit, OnDestroy {
       isDataOperational: isDataOn,
       isAppOperational: isAppOn
     });
+
+    this.dataContractAddress = this.FlightSuretyData.instance.address;
+    this.appContractAddress = this.FlightSuretyApp.instance.address;
   }
 
   toggleDataContract(): void {
@@ -96,21 +103,24 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   public async updateAppStatus(status: boolean) {
-    const obj = await this.FlightSuretyData.instance.setOperationalStatus(status, { from: this.currentAccount })
+    await this.FlightSuretyData.instance.setOperationalStatus(status, { from: this.currentAccount })
       .catch((error: any) => {
         console.log(error);
+        this.contractsForm.patchValue({
+          isAppOperational: !status
+        });
       });
-   // this.updateFormStatus();
   }
 
   public async updateDataStatus(status: boolean) {
-    const obj = await this.FlightSuretyData.instance.setOperationalStatus(status, { from: this.currentAccount })
+    await this.FlightSuretyData.instance.setOperationalStatus(status, { from: this.currentAccount })
       .catch((error: any) => {
         console.log(error);
+        this.contractsForm.patchValue({
+          isDataOperational: !status
+        });
       });
-   // this.updateFormStatus();
   }
-
 
   get isDataOperational(): boolean {
     return this.contractsForm.get('isDataOperational').value;

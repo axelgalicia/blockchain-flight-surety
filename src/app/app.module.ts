@@ -6,9 +6,11 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field'; 
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatButtonModule } from '@angular/material/button';
+import {MatTableModule} from '@angular/material/table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // Custom Modules
@@ -37,6 +39,8 @@ import { BlockchainService } from './common/services/blockchain.service';
     MatInputModule,
     MatFormFieldModule,
     MatSlideToggleModule,
+    MatButtonModule,
+    MatTableModule,
     FormsModule,
     ReactiveFormsModule,
     UtilModule,

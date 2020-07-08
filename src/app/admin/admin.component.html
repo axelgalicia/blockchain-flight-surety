@@ -12,19 +12,50 @@
             <div>
                 <mat-form-field class="field">
                     <mat-label>Data Contract</mat-label>
-                    <input matInput placeholder="Data contract address" value="{{dataContractAddress}}">
+                    <input matInput placeholder="Data contract address" value="{{dataContractAddress}}" disabled>
                 </mat-form-field>
-                <mat-slide-toggle formControlName="isDataOperational" (toggleChange)="toggleDataContract()">Is Operational</mat-slide-toggle>
+                <mat-slide-toggle formControlName="isDataOperational" (toggleChange)="toggleDataContract()">Is
+                    Operational</mat-slide-toggle>
             </div>
 
             <div>
                 <mat-form-field class="field">
                     <mat-label>App contract</mat-label>
-                    <input matInput placeholder="App contract address" value="{{appContractAddress}}">
+                    <input matInput placeholder="App contract address" value="{{appContractAddress}}" disabled>
                 </mat-form-field>
-                <mat-slide-toggle formControlName="isAppOperational" (toggleChange)="toggleAppContract()">Is Operational</mat-slide-toggle>
+                <mat-slide-toggle formControlName="isAppOperational" (toggleChange)="toggleAppContract()">Is Operational
+                </mat-slide-toggle>
             </div>
 
         </form>
     </mat-card-content>
+</mat-card>
+
+
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>Registered Flights</mat-card-title>
+    </mat-card-header>
+    <mat-table [dataSource]="dataRgisteredFlights" class="mat-elevation-z8">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+            <mat-header-cell *matHeaderCellDef> No. </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+        </ng-container>
+
+        <!-- Timestamp Column -->
+        <ng-container matColumnDef="timestamp">
+            <mat-header-cell *matHeaderCellDef> Timestamp </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.timestamp}} </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
 </mat-card>
