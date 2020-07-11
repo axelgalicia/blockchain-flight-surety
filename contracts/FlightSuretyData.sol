@@ -3,7 +3,6 @@ pragma solidity ^0.6.4;
 import "./SafeMath.sol";
 import "./OperationalOwnable.sol";
 
-
 contract FlightSuretyData is OperationalOwnable {
     using SafeMath for uint256;
 
@@ -11,9 +10,13 @@ contract FlightSuretyData is OperationalOwnable {
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
 
+    address payable private authorizedAppContract;
+
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
     /********************************************************************************************/
+
+    event AuthorizedAppContractUpdated(address payable newAddress);
 
     /**
      * @dev Constructor
@@ -38,6 +41,27 @@ contract FlightSuretyData is OperationalOwnable {
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
+
+    /**
+     *   @dev Update the authorized app contract address
+     *
+     */
+    function updateAuthorizedAppContract(address payable newAddress)
+        public
+        onlyOwner
+    {
+        _updateAuthorizedAppContract(newAddress);
+    }
+
+    /**
+     *   @dev Update the authorized app contract address
+     *
+     */
+    function _updateAuthorizedAppContract(address payable newAddress) internal {
+        require(newAddress != address(0), "The new contract address cannot be address 0");
+        authorizedAppContract = newAddress;
+        emit AuthorizedAppContractUpdated(newAddress);
+    }
 
     /**
      * @dev Add an airline to the registration queue

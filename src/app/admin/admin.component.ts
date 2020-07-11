@@ -7,6 +7,7 @@ import { BlockchainService } from '../common/services/blockchain.service';
 import { Contract } from "../common/interfaces/contract.interface";
 import { ContractName } from '../common/enums/contractName.enum';
 import { RegisteredFlight } from '../common/interfaces/registered-flight.interface';
+import { ToastService } from '../util/toast.service';
 
 
 @Component({
@@ -23,17 +24,23 @@ export class AdminComponent implements OnInit, OnDestroy {
   private FlightSuretyApp: Contract;
   private FlightSuretyData: Contract;
 
-  private currentAccount: string;
+  currentAccount: string;
 
   contractsForm: FormGroup;
 
   dataContractAddress: string;
   appContractAddress: string;
 
+  newFlightsForm: FormGroup;
+
+  newFlightNumber: string;
+  newFlightTime: string;
+
   dataRgisteredFlights: RegisteredFlight[] = [];
   displayedColumns: string[] = ['id', 'name', 'timestamp'];
 
   constructor(private formBuilder: FormBuilder,
+    private toastService: ToastService,
     private blockchainService: BlockchainService) {
 
     this.initForms();
@@ -52,6 +59,11 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.contractsForm = this.formBuilder.group({
       isDataOperational: true,
       isAppOperational: true
+    });
+
+    this.newFlightsForm = this.formBuilder.group({
+      newFlightNumber: '',
+      newFlightTime: ''
     });
   }
 
@@ -100,6 +112,14 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   toggleAppContract(): void {
     this.updateAppStatus(!this.isAppOperational);
+  }
+
+  public async authorizeContract() {
+    await this.FlightSuretyData.instance.updateAuthorizedAppContract(this.appContractAddress, { from: this.currentAccount }).
+      catch((error: any) => {
+        console.log(error);
+        this.toastService.showError('Could not authorize this contract!', 'Authorization');
+      });
   }
 
   public async updateAppStatus(status: boolean) {

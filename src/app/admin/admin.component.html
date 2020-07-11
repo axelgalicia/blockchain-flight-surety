@@ -12,7 +12,8 @@
             <div>
                 <mat-form-field class="field">
                     <mat-label>Data Contract</mat-label>
-                    <input matInput placeholder="Data contract address" value="{{dataContractAddress}}" disabled>
+                    <input matInput placeholder="Data contract address" value="{{dataContractAddress}}"
+                        [disabled]="!currentAccount">
                 </mat-form-field>
                 <mat-slide-toggle formControlName="isDataOperational" (toggleChange)="toggleDataContract()">Is
                     Operational</mat-slide-toggle>
@@ -21,10 +22,13 @@
             <div>
                 <mat-form-field class="field">
                     <mat-label>App contract</mat-label>
-                    <input matInput placeholder="App contract address" value="{{appContractAddress}}" disabled>
+                    <input matInput placeholder="App contract address" value="{{appContractAddress}}"
+                        [disabled]="!currentAccount">
                 </mat-form-field>
-                <mat-slide-toggle formControlName="isAppOperational" (toggleChange)="toggleAppContract()">Is Operational
-                </mat-slide-toggle>
+                <mat-slide-toggle formControlName="isAppOperational" class="is-app-operational"
+                    (toggleChange)="toggleAppContract()">Is Operational</mat-slide-toggle>
+                <button mat-stroked-button color="primary" (click)="authorizeContract()"
+                    [disabled]="!currentAccount">Authorize Contract</button>
             </div>
 
         </form>
@@ -32,10 +36,36 @@
 </mat-card>
 
 
+<!-- REGISTER FLIGHTS -->
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>New Flights</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <form class="form-new-flights" [formGroup]="newFlightsForm">
+            <div>
+                <mat-form-field class="field">
+                    <mat-label>Flight Number</mat-label>
+                    <input matInput placeholder="Flight Number" value="{{newFlightNumber}}"
+                        [disabled]="!currentAccount">
+                </mat-form-field>
+                <mat-form-field class="field">
+                    <mat-label>Flight Time</mat-label>
+                    <input matInput placeholder="Flight Time" value="{{newFlightTime}}" [disabled]="!currentAccount">
+                </mat-form-field>
+                <button mat-stroked-button color="primary" [disabled]="!currentAccount">Add</button>
+            </div>
+        </form>
+    </mat-card-content>
+</mat-card>
+
+
+
 <mat-card>
     <mat-card-header>
         <mat-card-title>Registered Flights</mat-card-title>
     </mat-card-header>
+
     <mat-table [dataSource]="dataRgisteredFlights" class="mat-elevation-z8">
         <!-- ID Column -->
         <ng-container matColumnDef="id">
@@ -58,4 +88,5 @@
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
     </mat-table>
+
 </mat-card>
