@@ -2,7 +2,7 @@ pragma solidity ^0.6.4;
 
 import "./SafeMath.sol";
 import "./OperationalOwnable.sol";
-
+import "./FlightSuretyData.sol";
 
 /************************************************** */
 /* FlightSurety Smart Contract                      */
@@ -19,6 +19,9 @@ contract FlightSuretyApp is OperationalOwnable {
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
 
+    // Data contract
+    FlightSuretyData dataContract;
+
     // Flight status codes
     uint8 private constant STATUS_CODE_UNKNOWN = 0;
     uint8 private constant STATUS_CODE_ON_TIME = 10;
@@ -28,15 +31,6 @@ contract FlightSuretyApp is OperationalOwnable {
     uint8 private constant STATUS_CODE_LATE_OTHER = 50;
 
     address private contractOwner; // Account used to deploy contract
-
-    struct Flight {
-        bool isRegistered;
-        uint8 statusCode;
-        uint256 updatedTimestamp;
-        address airline;
-    }
-
-    mapping(bytes32 => Flight) private flights;
 
     // region ORACLE MANAGEMENT
 
@@ -103,7 +97,9 @@ contract FlightSuretyApp is OperationalOwnable {
      * @dev Contract constructor
      *
      */
-    constructor() public {}
+    constructor(address payable dataContractAddress) public {
+        dataContract = FlightSuretyData(dataContractAddress);
+    }
 
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
@@ -189,6 +185,10 @@ contract FlightSuretyApp is OperationalOwnable {
         );
 
         return oracles[msg.sender].indexes;
+    }
+
+    function getDataContractAddress() external view returns (address payable) {
+        return address(dataContract);
     }
 
     // Called by oracle when a response is available to an outstanding request

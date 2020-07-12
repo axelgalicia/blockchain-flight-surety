@@ -1,1 +1,57 @@
-<p>airlines works!</p>
+<h1>Airlines Module</h1>
+
+
+<!-- NEW FLIGHTS -->
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>New Flights</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <form class="form-new-flights" [formGroup]="newFlightsForm">
+            <div>
+                <mat-form-field class="field">
+                    <mat-label>Flight Number</mat-label>
+                    <input matInput placeholder="Flight Number" value="{{newFlightNumber}}"
+                        [disabled]="!currentAccount">
+                </mat-form-field>
+                <mat-form-field class="field">
+                    <mat-label>Flight Time</mat-label>
+                    <input matInput placeholder="Flight Time" value="{{newFlightTime}}" [disabled]="!currentAccount">
+                </mat-form-field>
+                <button mat-stroked-button color="primary" [disabled]="!currentAccount">Add</button>
+            </div>
+        </form>
+    </mat-card-content>
+</mat-card>
+
+
+<!-- REGISTER FLIGHTS -->
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>Registered Flights</mat-card-title>
+    </mat-card-header>
+
+    <mat-table [dataSource]="dataRgisteredFlights" class="mat-elevation-z8">
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+            <mat-header-cell *matHeaderCellDef> No. </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+        </ng-container>
+
+        <!-- Timestamp Column -->
+        <ng-container matColumnDef="timestamp">
+            <mat-header-cell *matHeaderCellDef> Timestamp </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.timestamp}} </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+
+</mat-card>
