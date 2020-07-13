@@ -134,11 +134,12 @@ contract FlightSuretyApp is OperationalOwnable {
     /**
      * @dev Add an airline to the registration queue
      */
-    function registerAirline()
+    function registerAirline(string calldata name)
         external
-        pure
         returns (bool success, uint256 votes)
     {
+        require(bytes(name).length > 0, "Name cannot be empty");
+        dataContract.registerAirline(msg.sender, name);
         return (success, 0);
     }
 

@@ -12,12 +12,24 @@ contract FlightSuretyData is OperationalOwnable {
 
     address payable private authorizedAppContract;
 
+    mapping(address => Airline) private airlines;
+
+    enum AirlineStatus {
+        PendingApproval, 
+        Registered, 
+        Paid
+    }
+
+    struct Airline {
+        AirlineStatus status;
+        string name;
+    }
 
     struct Flight {
         bool isRegistered;
         uint8 statusCode;
         uint256 updatedTimestamp;
-        address airline;
+        address payable airline;
     }
 
     mapping(bytes32 => Flight) private flights;
@@ -27,6 +39,8 @@ contract FlightSuretyData is OperationalOwnable {
     /********************************************************************************************/
 
     event AuthorizedAppContractUpdated(address payable newAddress);
+
+    event NewAirlineRegistered(address payable airline);
 
     /**
      * @dev Constructor
@@ -48,6 +62,11 @@ contract FlightSuretyData is OperationalOwnable {
     // Modifiers help avoid duplication of code. They are typically used to validate something
     // before a function is allowed to be executed.
 
+    modifier onlyAuthorizedContract() {
+        require(msg.sender == authorizedAppContract, "Caller not authorized to make this call");
+        _;
+    }
+
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
@@ -68,7 +87,10 @@ contract FlightSuretyData is OperationalOwnable {
      *
      */
     function _updateAuthorizedAppContract(address payable newAddress) internal {
-        require(newAddress != address(0), "The new contract address cannot be address 0");
+        require(
+            newAddress != address(0),
+            "The new contract address cannot be address 0"
+        );
         authorizedAppContract = newAddress;
         emit AuthorizedAppContractUpdated(newAddress);
     }
@@ -79,7 +101,15 @@ contract FlightSuretyData is OperationalOwnable {
      *
      */
 
-    function registerAirline() external pure {}
+    function registerAirline(address payable airline, string calldata name)
+        external
+        onlyAuthorizedContract
+    {
+        require(bytes(airlines[airline].name).length > 0, "Airline already registered");
+        Airline memory newAirline = Airline(AirlineStatus.Registered, name);
+        airlines[airline] = newAirline;
+        emit NewAirlineRegistered(airline);
+    }
 
     /**
      * @dev Buy insurance for a flight
