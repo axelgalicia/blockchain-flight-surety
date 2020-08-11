@@ -1,4 +1,6 @@
-pragma solidity ^0.6.4;
+// SPDX-License-Identifier: GPL-3.0
+pragma experimental ABIEncoderV2;
+pragma solidity >=0.7.0 <0.8.0;
 
 import "./SafeMath.sol";
 import "./OperationalOwnable.sol";
@@ -12,7 +14,14 @@ contract FlightSuretyData is OperationalOwnable {
 
     address payable private authorizedAppContract;
 
+    // Mappings
     mapping(address => Airline) private airlines;
+    mapping(string => Flight) private flights;
+
+    // Arrays
+    Airline[] private registeredAirlines;
+    Flight[] private registeredFlights;
+
 
     enum AirlineStatus {
         PendingApproval, 
@@ -23,16 +32,16 @@ contract FlightSuretyData is OperationalOwnable {
     struct Airline {
         AirlineStatus status;
         string name;
+        address payable airlineAddress;
     }
 
     struct Flight {
         bool isRegistered;
         uint8 statusCode;
         uint256 updatedTimestamp;
-        address payable airline;
+        string name;
+        Airline airline;
     }
-
-    mapping(bytes32 => Flight) private flights;
 
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
@@ -42,11 +51,15 @@ contract FlightSuretyData is OperationalOwnable {
 
     event NewAirlineRegistered(address payable airline);
 
+    event NewFlightRegistered(string airlineName, string flightName);
+
+    event TestStringValue(string value);
+
     /**
      * @dev Constructor
      *      The deploying account becomes contractOwner
      */
-    constructor() public {}
+    constructor(){}
 
     /**
      * @dev Fallback function for funding smart contract.
@@ -101,14 +114,56 @@ contract FlightSuretyData is OperationalOwnable {
      *
      */
 
-    function registerAirline(address payable airline, string calldata name)
+    function registerAirline(address payable airlineAddress, string calldata name)
         external
         onlyAuthorizedContract
     {
-        require(bytes(airlines[airline].name).length > 0, "Airline already registered");
-        Airline memory newAirline = Airline(AirlineStatus.Registered, name);
-        airlines[airline] = newAirline;
-        emit NewAirlineRegistered(airline);
+        // require(bytes(airlines[airlineAddress].name).length > 0, "Airline already registered");
+        Airline memory newAirline = Airline(AirlineStatus.Registered, name, airlineAddress);
+        airlines[airlineAddress] = newAirline;
+        emit NewAirlineRegistered(airlineAddress);
+        registeredAirlines.push(newAirline);
+    }
+
+    function allAirlines()
+    public view
+    returns(Airline[] memory)
+    {
+        return registeredAirlines;
+    }
+
+     function allFlights()
+    public view
+    returns(Flight[] memory)
+    {
+        return registeredFlights;
+    }
+
+
+    /**
+    * @dev Add new Flight
+    *
+    */
+    function registerFlight(address payable airlineAddress, string memory flightName, uint256 flightTime) 
+    external
+    onlyAuthorizedContract 
+    {
+        require(flights[flightName].isRegistered, "Flight name already registered");
+        require(bytes(airlines[airlineAddress].name).length == 0, "Airline does not exist");
+
+        Airline memory airline = airlines[airlineAddress];
+        Flight memory newFlight = Flight(
+            true,
+            0,
+            flightTime,
+            flightName,
+            airline
+        );
+
+        flights[flightName] = newFlight;
+        registeredFlights.push(newFlight);
+        emit NewFlightRegistered(airline.name, flightName);
+
     }
 
     /**

@@ -2,13 +2,13 @@ const FlightSuretyApp = artifacts.require("FlightSuretyApp");
 const FlightSuretyData = artifacts.require("FlightSuretyData");
 const fs = require('fs');
 
-module.exports = function(deployer) {
+module.exports = function(deployer, network, accounts) {
 
-    let firstAirline = '0x442f137Cae07FD6c7c62B0fad2E6e447Dd765412';
+    let firstAccount = accounts[0];
     deployer.deploy(FlightSuretyData)
     .then(() => {
         return deployer.deploy(FlightSuretyApp, FlightSuretyData.address)
-                .then(() => {
+                .then(async () => {
                     let config = {
                         localhost: {
                             url: 'http://localhost:8545',
@@ -18,6 +18,17 @@ module.exports = function(deployer) {
                     }
                     fs.writeFileSync(__dirname + '/../dapp/config.json',JSON.stringify(config, null, '\t'), 'utf-8');
                     fs.writeFileSync(__dirname + '/../oracles/config.json',JSON.stringify(config, null, '\t'), 'utf-8');
+
+                    let dataInstance = await FlightSuretyData.deployed();
+                    let appInstance = await FlightSuretyApp.deployed();
+
+                    // Authorize AppContract on DataContract
+                    await dataInstance.updateAuthorizedAppContract(FlightSuretyApp.address, {from: firstAccount});
+                    // Register First Airline by default
+                    await appInstance.registerAirline('Air Canada', {from: firstAccount});
+                    // Register First Flight by default
+                    //await appInstance.registerFlight('Air Canada', {from: firstAccount});
+
                 });
     });
 }

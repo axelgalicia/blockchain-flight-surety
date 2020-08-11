@@ -1,0 +1,1 @@
+exports.id=0,exports.modules={"./oracles/config.json":function(s){s.exports=JSON.parse('{"localhost":{"url":"http://localhost:8545","dataAddress":"0xfc082512D8D546A5188D79C9fD0671EDA50dE9f5","appAddress":"0x21fCaE8e14Da77803a60Be025582C31e03dCa29f"}}')}};

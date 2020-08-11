@@ -1,4 +1,5 @@
-pragma solidity ^0.6.4;
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.7.0 <0.8.0;
 
 import "./SafeMath.sol";
 import "./OperationalOwnable.sol";
@@ -89,6 +90,8 @@ contract FlightSuretyApp is OperationalOwnable {
         uint256 timestamp
     );
 
+    event TestingValue(string value);
+
     /********************************************************************************************/
     /*                                       CONSTRUCTOR                                        */
     /********************************************************************************************/
@@ -97,7 +100,7 @@ contract FlightSuretyApp is OperationalOwnable {
      * @dev Contract constructor
      *
      */
-    constructor(address payable dataContractAddress) public {
+    constructor(address payable dataContractAddress) {
         dataContract = FlightSuretyData(dataContractAddress);
     }
 
@@ -161,10 +164,8 @@ contract FlightSuretyApp is OperationalOwnable {
         bytes32 key = keccak256(
             abi.encodePacked(index, airline, flight, timestamp)
         );
-        oracleResponses[key] = ResponseInfo({
-            requester: msg.sender,
-            isOpen: true
-        });
+        oracleResponses[key].requester = msg.sender;
+        oracleResponses[key].isOpen = true;
 
         emit OracleRequest(index, airline, flight, timestamp);
     }

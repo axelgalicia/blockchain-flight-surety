@@ -1,4 +1,5 @@
-pragma solidity ^0.6.4;
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.7.0 <0.8.0;
 
 
 contract OperationalOwnable {
@@ -14,7 +15,7 @@ contract OperationalOwnable {
     event TransferOwnership(address indexed oldOwner, address indexed newOwner);
 
     // Assign the contract to an owner
-    constructor() internal {
+    constructor() {
         contractOwner = msg.sender;
         emit TransferOwnership(address(0), contractOwner);
     }
@@ -88,7 +89,7 @@ contract OperationalOwnable {
     // Define an internal function to transfer ownership
     function _transferOwnership(address payable newOwner) internal {
         require(newOwner != address(0), "The new Owner cannot be address 0");
-        emit TransferOwnership(contractOwner, newOwner);
         contractOwner = newOwner;
+        emit TransferOwnership(contractOwner, newOwner);
     }
 }

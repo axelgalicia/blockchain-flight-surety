@@ -107,7 +107,6 @@ export class Web3Service implements OnDestroy {
 
   listenForTxLogs() {
     this.subs.add(this.web3.eth.subscribe('logs', {}, (error, log) => {
-      alert('entra');
      })
       .on("data", (log: Log) => {
         this.txLogSource.next(log);

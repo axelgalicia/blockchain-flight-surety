@@ -19,25 +19,15 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   private subs = new Subscription();
 
-
   // Public contracts
   private FlightSuretyApp: Contract;
   private FlightSuretyData: Contract;
 
   currentAccount: string;
-
   contractsForm: FormGroup;
 
   dataContractAddress: string;
   appContractAddress: string;
-
-  newFlightsForm: FormGroup;
-
-  newFlightNumber: string;
-  newFlightTime: string;
-
-  dataRgisteredFlights: RegisteredFlight[] = [];
-  displayedColumns: string[] = ['id', 'name', 'timestamp'];
 
   constructor(private formBuilder: FormBuilder,
     private toastService: ToastService,
@@ -59,11 +49,6 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.contractsForm = this.formBuilder.group({
       isDataOperational: true,
       isAppOperational: true
-    });
-
-    this.newFlightsForm = this.formBuilder.group({
-      newFlightNumber: '',
-      newFlightTime: ''
     });
   }
 
@@ -119,6 +104,12 @@ export class AdminComponent implements OnInit, OnDestroy {
       catch((error: any) => {
         console.log(error);
         this.toastService.showError('Could not authorize this contract!', 'Authorization');
+      });
+
+      await this.FlightSuretyApp.instance.registerAirline("Aeromexico", { from: this.currentAccount }).
+      catch((error: any) => {
+        console.log(error);
+        this.toastService.showError('Could not register new Airline!', 'Airline Register Error');
       });
   }
 
