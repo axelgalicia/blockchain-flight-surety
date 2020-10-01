@@ -49,11 +49,15 @@ contract FlightSuretyData is OperationalOwnable {
 
     event AuthorizedAppContractUpdated(address payable newAddress);
 
-    event NewAirlineRegistered(address payable airline);
+    event NewAirlineRegistered(Airline airline);
 
-    event NewFlightRegistered(string airlineName, string flightName);
+    event NewFlightRegistered(string airlineName, string flightName, uint256 timestamp);
 
     event TestStringValue(string value);
+
+    event TestIntValue(uint256 value);
+
+    event TestBooleanValue(bool value);
 
     /**
      * @dev Constructor
@@ -118,10 +122,10 @@ contract FlightSuretyData is OperationalOwnable {
         external
         onlyAuthorizedContract
     {
-        // require(bytes(airlines[airlineAddress].name).length > 0, "Airline already registered");
+        require(bytes(airlines[airlineAddress].name).length < 1, "Airline already registered");
         Airline memory newAirline = Airline(AirlineStatus.Registered, name, airlineAddress);
         airlines[airlineAddress] = newAirline;
-        emit NewAirlineRegistered(airlineAddress);
+        emit NewAirlineRegistered(newAirline);
         registeredAirlines.push(newAirline);
     }
 
@@ -148,8 +152,9 @@ contract FlightSuretyData is OperationalOwnable {
     external
     onlyAuthorizedContract 
     {
-        require(flights[flightName].isRegistered, "Flight name already registered");
-        require(bytes(airlines[airlineAddress].name).length == 0, "Airline does not exist");
+
+        require(!flights[flightName].isRegistered, "Flight name already registered");
+        require(bytes(airlines[airlineAddress].name).length > 1, "Airline does not exist");
 
         Airline memory airline = airlines[airlineAddress];
         Flight memory newFlight = Flight(
@@ -162,7 +167,7 @@ contract FlightSuretyData is OperationalOwnable {
 
         flights[flightName] = newFlight;
         registeredFlights.push(newFlight);
-        emit NewFlightRegistered(airline.name, flightName);
+        emit NewFlightRegistered(airline.name, flightName, flightTime);
 
     }
 
