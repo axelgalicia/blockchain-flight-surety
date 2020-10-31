@@ -28,7 +28,7 @@
     "express": "^4.17.1",
     "ngx-toastr": "^12.0.1",
     "rxjs": "^6.5.5",
-    "solc": "^0.6.6",
+    "solc": "^0.7.4",
     "solium": "^1.2.5",
     "start-server-webpack-plugin": "^2.2.5",
     "truffle": "^5.1.21",
@@ -42,7 +42,7 @@
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.900.5",
+    "@angular-devkit/build-angular": "^0.1002.0",
     "@angular/cli": "~9.0.5",
     "@angular/compiler-cli": "~9.0.5",
     "@angular/language-service": "~9.0.5",
@@ -52,7 +52,7 @@
     "codelyzer": "^5.1.2",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",
-    "karma": "~4.3.0",
+    "karma": "^5.2.3",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage-istanbul-reporter": "~2.1.0",
     "karma-jasmine": "~2.0.1",

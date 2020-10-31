@@ -127,5 +127,8 @@
       }
     }
   },
-  "defaultProject": "flight-app"
+  "defaultProject": "flight-app",
+  "cli": {
+    "analytics": "e1284dd6-5c6d-4f5c-8580-17403159e65e"
+  }
 }
