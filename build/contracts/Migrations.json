@@ -1421,11 +1421,11 @@
       "events": {},
       "links": {},
       "address": "0x8287B1c8e131dc04C070cBbA3825999Df659c81f",
-      "transactionHash": "0x9881b17cccd42fb14e26a1b56fee2530e8532d891895ec29cd5472dc88a44a16"
+      "transactionHash": "0xb5247ff2e53dd0346349974a119b5c697c9b7bf3a8a193769d8b012cba0b9c4c"
     }
   },
-  "schemaVersion": "3.2.5",
-  "updatedAt": "2020-10-08T17:30:14.363Z",
+  "schemaVersion": "3.3.1",
+  "updatedAt": "2020-11-01T01:05:27.668Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
