@@ -4,6 +4,10 @@ const nodeExternals = require('webpack-node-externals')
 const StartServerPlugin = require('start-server-webpack-plugin')
 
 module.exports = {
+    node: {
+        fs: "empty",
+        module: "empty"
+     },
     entry: [
         'webpack/hot/poll?1000',
         './oracles/index'
@@ -11,7 +15,7 @@ module.exports = {
     watch: true,
     target: 'node',
     externals: [nodeExternals({
-        whitelist: ['webpack/hot/poll?1000']
+        allowlist: ['webpack/hot/poll?1000']
     })],
     module: {
         rules: [{

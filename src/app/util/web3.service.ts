@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { default as Web3 } from 'web3';
-import { default as contract } from 'truffle-contract';
+const contract = require('@truffle/contract');
 import { ContractName } from '../common/enums/contractName.enum';
 import { Contract } from "../common/interfaces/contract.interface";
 import { Log } from "../common/interfaces/log.interface";

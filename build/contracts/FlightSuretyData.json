@@ -19093,96 +19093,6 @@
           "name": "AuthorizedAppContractUpdated",
           "type": "event"
         },
-        "0x53f16340874f686d239bb80161aeda17688bcb49ef5405c9090973a5d0426fa6": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address payable",
-              "name": "airline",
-              "type": "address"
-            }
-          ],
-          "name": "NewAirlineRegistered",
-          "type": "event"
-        },
-        "0xea6bc2caf3e9a38cdf9d34fa48de19052ab65804dcc2a04921de5cee49147a37": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "airlineName",
-              "type": "string"
-            },
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "flightName",
-              "type": "string"
-            }
-          ],
-          "name": "NewFlightRegistered",
-          "type": "event"
-        },
-        "0x8d63163eb6a83d99102c39dc0eb28e60f5292066deacc01cf1167d6aef2588b1": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "value",
-              "type": "string"
-            }
-          ],
-          "name": "TestStringValue",
-          "type": "event"
-        },
-        "0x5c486528ec3e3f0ea91181cff8116f02bfa350e03b8b6f12e00765adbb5af85c": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "oldOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "newOwner",
-              "type": "address"
-            }
-          ],
-          "name": "TransferOwnership",
-          "type": "event"
-        },
-        "0xb6d5f5457d1c101e27891c7154e37f1578a63e19a5396705b34a4b3596b0cab5": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "bool",
-              "name": "mode",
-              "type": "bool"
-            }
-          ],
-          "name": "UpdateOperationalStatus",
-          "type": "event"
-        },
-        "0xecbdc1ea0b1fa467184398864538a360b682db776daee1e670aa4f5e481b413e": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "value",
-              "type": "uint256"
-            }
-          ],
-          "name": "TestIntValue",
-          "type": "event"
-        },
         "0xf552aa4c67473ff91f76059999074821b16f99df5ffd2cc08f0d13d5502caf5c": {
           "anonymous": false,
           "inputs": [
@@ -19250,15 +19160,73 @@
           ],
           "name": "TestBooleanValue",
           "type": "event"
+        },
+        "0xecbdc1ea0b1fa467184398864538a360b682db776daee1e670aa4f5e481b413e": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "TestIntValue",
+          "type": "event"
+        },
+        "0x8d63163eb6a83d99102c39dc0eb28e60f5292066deacc01cf1167d6aef2588b1": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "value",
+              "type": "string"
+            }
+          ],
+          "name": "TestStringValue",
+          "type": "event"
+        },
+        "0x5c486528ec3e3f0ea91181cff8116f02bfa350e03b8b6f12e00765adbb5af85c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "oldOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "TransferOwnership",
+          "type": "event"
+        },
+        "0xb6d5f5457d1c101e27891c7154e37f1578a63e19a5396705b34a4b3596b0cab5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "mode",
+              "type": "bool"
+            }
+          ],
+          "name": "UpdateOperationalStatus",
+          "type": "event"
         }
       },
       "links": {},
-      "address": "0x74CA90455Bfb99A9A3C6E67201C24aaafd2bc4E9",
-      "transactionHash": "0x75e3322a1a7314510892ba5d18932c8fb784be7c7bd7fcac5bfbea2f5bd0a7b5"
+      "address": "0x462B58E5e8591c637eE3055aab110Ed0e672a50c",
+      "transactionHash": "0x34ef1791981189a34e736d61ccc68e6cf5622ef708861e77f5c2720124f98322"
     }
   },
   "schemaVersion": "3.3.1",
-  "updatedAt": "2020-11-01T01:05:27.645Z",
+  "updatedAt": "2020-11-06T02:27:12.054Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
