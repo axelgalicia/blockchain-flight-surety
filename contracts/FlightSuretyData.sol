@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma experimental ABIEncoderV2;
-pragma solidity >=0.7.0 <0.8.0;
+pragma solidity >=0.7.5 <0.8.0;
 
 import "./SafeMath.sol";
 import "./OperationalOwnable.sol";
@@ -54,9 +54,7 @@ contract FlightSuretyData is OperationalOwnable {
     event NewFlightRegistered(string airlineName, string flightName, uint256 timestamp);
 
     event TestStringValue(string value);
-
     event TestIntValue(uint256 value);
-
     event TestBooleanValue(bool value);
 
     /**
@@ -122,7 +120,7 @@ contract FlightSuretyData is OperationalOwnable {
         external
         onlyAuthorizedContract
     {
-        require(bytes(airlines[airlineAddress].name).length < 1, "Airline already registered");
+        require(!_isAirlineRegistered(airlineAddress), "Airline already registered");
         Airline memory newAirline = Airline(AirlineStatus.Registered, name, airlineAddress);
         airlines[airlineAddress] = newAirline;
         emit NewAirlineRegistered(newAirline);
@@ -153,8 +151,8 @@ contract FlightSuretyData is OperationalOwnable {
     onlyAuthorizedContract 
     {
 
-        require(!flights[flightName].isRegistered, "Flight name already registered");
-        require(bytes(airlines[airlineAddress].name).length > 1, "Airline does not exist");
+        require(!_isFlightRegistered(flightName), "Flight name already registered");
+        require(_isAirlineRegistered(airlineAddress), "Airline does not exist");
 
         Airline memory airline = airlines[airlineAddress];
         Flight memory newFlight = Flight(
@@ -201,7 +199,15 @@ contract FlightSuretyData is OperationalOwnable {
 
     function fund() public payable {}
 
-    function getFlightKey(
+    function _isAirlineRegistered(address payable airlineAddress) internal view returns (bool) {
+        return bytes(airlines[airlineAddress].name).length > 1;
+    }
+
+    function _isFlightRegistered(string memory flightName) internal view returns (bool) {
+        return flights[flightName].isRegistered;
+    }
+
+    function _getFlightKey(
         address airline,
         string memory flight,
         uint256 timestamp

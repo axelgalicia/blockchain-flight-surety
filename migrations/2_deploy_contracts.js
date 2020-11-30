@@ -2,12 +2,12 @@ const FlightSuretyApp = artifacts.require("FlightSuretyApp");
 const FlightSuretyData = artifacts.require("FlightSuretyData");
 const fs = require('fs');
 
-module.exports = function(deployer, network, accounts) {
+module.exports = function (deployer, network, accounts) {
 
     let firstAccount = accounts[0];
     deployer.deploy(FlightSuretyData)
-    .then(() => {
-        return deployer.deploy(FlightSuretyApp, FlightSuretyData.address)
+        .then(() => {
+            return deployer.deploy(FlightSuretyApp, FlightSuretyData.address)
                 .then(async () => {
                     let config = {
                         localhost: {
@@ -16,16 +16,16 @@ module.exports = function(deployer, network, accounts) {
                             appAddress: FlightSuretyApp.address
                         }
                     }
-                    fs.writeFileSync(__dirname + '/../dapp/config.json',JSON.stringify(config, null, '\t'), 'utf-8');
-                    fs.writeFileSync(__dirname + '/../oracles/config.json',JSON.stringify(config, null, '\t'), 'utf-8');
+                    fs.writeFileSync(__dirname + '/../dapp/config.json', JSON.stringify(config, null, '\t'), 'utf-8');
+                    fs.writeFileSync(__dirname + '/../oracles/config.json', JSON.stringify(config, null, '\t'), 'utf-8');
 
                     let dataInstance = await FlightSuretyData.deployed();
                     let appInstance = await FlightSuretyApp.deployed();
 
                     // Authorize AppContract on DataContract
-                    await dataInstance.updateAuthorizedAppContract(FlightSuretyApp.address, {from: firstAccount});
+                    await dataInstance.updateAuthorizedAppContract(FlightSuretyApp.address, { from: firstAccount });
                     // Register First Airline by default
-                    await appInstance.registerAirline('Air Canada', {from: firstAccount});
+                    await appInstance.registerAirline('Air Canada', { from: firstAccount });
 
                     // Register First Flight by default
                     //await appInstance.registerFlight('Air Canada', {from: firstAccount});
@@ -34,5 +34,5 @@ module.exports = function(deployer, network, accounts) {
                     // data.getPastEvents('allEvents', {fromBlock: 0, toBlock :'latest'}).then(result => console.log(result))
 
                 });
-    });
+        });
 }
