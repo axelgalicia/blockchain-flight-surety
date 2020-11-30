@@ -20,25 +20,25 @@ export class Web3Service implements OnDestroy {
   private web3Configured = false;
   private accounts: string[];
   // Contracts
-  private FlightSuretyApp: any;
-  private FlightSuretyData: any;
+  private flightSuretyApp: any;
+  private flightSuretyData: any;
 
   // Deployed Contracts
   private deployedContracts = new Map<ContractName, Contract>();
   private deployedContractsSource = new BehaviorSubject<Map<ContractName, Contract>>(null);
-  deployedContracts$ = this.deployedContractsSource.asObservable();
+  public readonly deployedContracts$ = this.deployedContractsSource.asObservable();
 
   // Current Metamask Account
   private currentAccountSource = new BehaviorSubject<string>(null);
-  currentAccount$ = this.currentAccountSource.asObservable();
+  public readonly currentAccount$ = this.currentAccountSource.asObservable();
 
   // Tx Logs
   private txLogSource = new Subject<Log>();
-  txLog$ = this.txLogSource.asObservable();
+  public readonly txLog$ = this.txLogSource.asObservable();
 
   // Web3 Object
   private web3Source = new BehaviorSubject<any>(null);
-  web3$ = this.web3Source.asObservable();
+  public readonly web3$ = this.web3Source.asObservable();
 
   constructor(private windowRef: WindowReferenceService,
     private toastService: ToastService) {
@@ -52,12 +52,12 @@ export class Web3Service implements OnDestroy {
     this.subs.unsubscribe();
   }
 
-  private setupMetamaskWeb3() {
+  private setupMetamaskWeb3(): void {
     if (!this.windowRef.nativeWindow) {
-      throw new Error('Can not get the window');
+      throw new Error('Cannot get the window object');
     }
     if (!this.windowRef.nativeWindow.web3) {
-      const msg = 'Not a metamask browser';
+      const msg = 'Not a Metamask browser';
       this.setCurrentAccount('Not connected');
       this.toastService.showError(msg, 'Connection Error');
       return;
@@ -67,7 +67,7 @@ export class Web3Service implements OnDestroy {
     this.web3Source.next(this.web3);
   }
 
-  private async setupContracts() {
+  private async setupContracts(): Promise<void> {
     this.setupMetamaskWeb3();
 
     if (!this.web3Configured) {
@@ -75,15 +75,15 @@ export class Web3Service implements OnDestroy {
     }
 
     // Create Contract object from ABI JSON object
-    this.FlightSuretyApp = contract(flight_surety_app_artifacts);
-    this.FlightSuretyData = contract(flight_surety_data_artifacts);
+    this.flightSuretyApp = contract(flight_surety_app_artifacts);
+    this.flightSuretyData = contract(flight_surety_data_artifacts);
 
-    this.FlightSuretyApp.setProvider(this.web3.currentProvider);
-    this.FlightSuretyData.setProvider(this.web3.currentProvider);
+    this.flightSuretyApp.setProvider(this.web3.currentProvider);
+    this.flightSuretyData.setProvider(this.web3.currentProvider);
 
     // Create new Truffle instances of these contracts
-    this.FlightSuretyApp = await this.FlightSuretyApp.deployed();
-    this.FlightSuretyData = await this.FlightSuretyData.deployed();
+    this.flightSuretyApp = await this.flightSuretyApp.deployed();
+    this.flightSuretyData = await this.flightSuretyData.deployed();
 
     // Listen for Transaction logs
     this.listenForTxLogs();
@@ -91,21 +91,21 @@ export class Web3Service implements OnDestroy {
     this.updateContracts([
       {
         name: ContractName.FLIGHT_SURETY_APP,
-        instance: this.FlightSuretyApp
+        instance: this.flightSuretyApp
       },
       {
         name: ContractName.FLIGHT_SURETY_DATA,
-        instance: this.FlightSuretyData
+        instance: this.flightSuretyData
       }
     ]);
 
   }
 
-  private async isMetamaskUnlocked() {
+  private async isMetamaskUnlocked(): Promise<boolean> {
     return await this.windowRef.nativeWindow.web3.currentProvider._metamask.isUnlocked();
   }
 
-  listenForTxLogs() {
+  listenForTxLogs(): void {
     this.subs.add(this.web3.eth.subscribe('logs', {}, (error, log) => {
      })
       .on("data", (log: Log) => {
@@ -119,7 +119,7 @@ export class Web3Service implements OnDestroy {
   }
 
 
-  private async refreshAccounts() {
+  private async refreshAccounts(): Promise<void> {
 
     const isMetamaskUnblocked = await this.isMetamaskUnlocked();
     if (!this.web3Configured || !isMetamaskUnblocked) {

@@ -120,7 +120,7 @@ contract FlightSuretyData is OperationalOwnable {
         external
         onlyAuthorizedContract
     {
-        require(!_isAirlineRegistered(airlineAddress), "Airline already registered");
+        require(!_isAirlineRegisteredForAccount(airlineAddress), "This account has an Airline already registered");
         Airline memory newAirline = Airline(AirlineStatus.Registered, name, airlineAddress);
         airlines[airlineAddress] = newAirline;
         emit NewAirlineRegistered(newAirline);
@@ -152,7 +152,7 @@ contract FlightSuretyData is OperationalOwnable {
     {
 
         require(!_isFlightRegistered(flightName), "Flight name already registered");
-        require(_isAirlineRegistered(airlineAddress), "Airline does not exist");
+        require(_isAirlineRegisteredForAccount(airlineAddress), "Airline does not exist");
 
         Airline memory airline = airlines[airlineAddress];
         Flight memory newFlight = Flight(
@@ -199,7 +199,7 @@ contract FlightSuretyData is OperationalOwnable {
 
     function fund() public payable {}
 
-    function _isAirlineRegistered(address payable airlineAddress) internal view returns (bool) {
+    function _isAirlineRegisteredForAccount(address payable airlineAddress) internal view returns (bool) {
         return bytes(airlines[airlineAddress].name).length > 1;
     }
 

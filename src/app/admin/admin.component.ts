@@ -6,7 +6,6 @@ import { Subscription } from 'rxjs';
 import { BlockchainService } from '../common/services/blockchain.service';
 import { Contract } from "../common/interfaces/contract.interface";
 import { ContractName } from '../common/enums/contractName.enum';
-import { RegisteredFlight } from '../common/interfaces/registered-flight.interface';
 import { ToastService } from '../util/toast.service';
 
 
@@ -20,14 +19,11 @@ export class AdminComponent implements OnInit, OnDestroy {
   private subs = new Subscription();
 
   // Public contracts
-  private FlightSuretyApp: Contract;
-  private FlightSuretyData: Contract;
+  private flightSuretyAppContract: Contract;
+  private flightSuretyData: Contract;
 
   currentAccount: string;
   contractsForm: FormGroup;
-
-  dataContractAddress: string;
-  appContractAddress: string;
 
   constructor(private formBuilder: FormBuilder,
     private toastService: ToastService,
@@ -45,50 +41,52 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
 
-  private initForms() {
+  private initForms(): void {
     this.contractsForm = this.formBuilder.group({
       isDataOperational: true,
-      isAppOperational: true
+      isAppOperational: true,
+      dataContractAddress: '0x',
+      appContractAddress: '0x'
     });
   }
 
-  private listenForContracts() {
+  private listenForContracts(): void {
     this.subs.add(this.blockchainService.deployedContracts$.subscribe(async (deployedContracts: Map<ContractName, any>) => {
       if (deployedContracts === null) {
         return;
       }
-      this.FlightSuretyApp = deployedContracts.get(ContractName.FLIGHT_SURETY_APP);
-      this.FlightSuretyData = deployedContracts.get(ContractName.FLIGHT_SURETY_DATA);
+      this.flightSuretyAppContract = deployedContracts.get(ContractName.FLIGHT_SURETY_APP);
+      this.flightSuretyData = deployedContracts.get(ContractName.FLIGHT_SURETY_DATA);
       this.listenForCurrentAccount();
       this.updateFormStatus();
     }));
   }
 
-  private listenForCurrentAccount() {
+  private listenForCurrentAccount(): void {
     this.subs.add(this.blockchainService.currentAccount$.subscribe((currentAccount: string) => {
       this.currentAccount = currentAccount;
     }));
   }
 
   private async isDataContractOperational(): Promise<boolean> {
-    return await this.FlightSuretyData.instance.isOperational();
+    return await this.flightSuretyData.instance.isOperational();
   }
 
   private async isAppContractOperational(): Promise<boolean> {
-    return await this.FlightSuretyApp.instance.isOperational();
+    return await this.flightSuretyAppContract.instance.isOperational();
   }
 
-  private async updateFormStatus() {
+  private async updateFormStatus(): Promise<void> {
     const isDataOn = await this.isDataContractOperational();
     const isAppOn = await this.isAppContractOperational();
 
     this.contractsForm.patchValue({
       isDataOperational: isDataOn,
-      isAppOperational: isAppOn
+      isAppOperational: isAppOn,
+      dataContractAddress: this.flightSuretyData.instance.address,
+      appContractAddress: this.flightSuretyAppContract.instance.address,
     });
 
-    this.dataContractAddress = this.FlightSuretyData.instance.address;
-    this.appContractAddress = this.FlightSuretyApp.instance.address;
   }
 
   toggleDataContract(): void {
@@ -99,22 +97,16 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.updateAppStatus(!this.isAppOperational);
   }
 
-  public async authorizeContract() {
-    await this.FlightSuretyData.instance.updateAuthorizedAppContract(this.appContractAddress, { from: this.currentAccount }).
+  public async authorizeContract(): Promise<void> {
+    await this.flightSuretyData.instance.updateAuthorizedAppContract(this.getAppContractAddress, { from: this.currentAccount }).
       catch((error: any) => {
         console.log(error);
         this.toastService.showError('Could not authorize this contract!', 'Authorization');
       });
-
-      await this.FlightSuretyApp.instance.registerAirline("Aeromexico", { from: this.currentAccount }).
-      catch((error: any) => {
-        console.log(error);
-        this.toastService.showError('Could not register new Airline!', 'Airline Register Error');
-      });
   }
 
-  public async updateAppStatus(status: boolean) {
-    await this.FlightSuretyData.instance.setOperationalStatus(status, { from: this.currentAccount })
+  public async updateAppStatus(status: boolean): Promise<void> {
+    await this.flightSuretyAppContract.instance.setOperationalStatus(status, { from: this.currentAccount })
       .catch((error: any) => {
         console.log(error);
         this.contractsForm.patchValue({
@@ -123,8 +115,8 @@ export class AdminComponent implements OnInit, OnDestroy {
       });
   }
 
-  public async updateDataStatus(status: boolean) {
-    await this.FlightSuretyData.instance.setOperationalStatus(status, { from: this.currentAccount })
+  public async updateDataStatus(status: boolean): Promise<void> {
+    await this.flightSuretyData.instance.setOperationalStatus(status, { from: this.currentAccount })
       .catch((error: any) => {
         console.log(error);
         this.contractsForm.patchValue({
@@ -134,11 +126,24 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   get isDataOperational(): boolean {
-    return this.contractsForm.get('isDataOperational').value;
+    return this.getContractFormValue('isDataOperational');
   }
 
   get isAppOperational(): boolean {
-    return this.contractsForm.get('isAppOperational').value;
+    return this.getContractFormValue('isAppOperational');
+  }
+
+  get getDataContractAddress(): boolean {
+    return this.getContractFormValue('dataContractAddress');
+  }
+
+  get getAppContractAddress(): boolean {
+    return this.getContractFormValue('appContractAddress');
+  }
+
+
+  getContractFormValue(formControlName: string): any {
+    return this.contractsForm.get(formControlName).value;
   }
 
 }
