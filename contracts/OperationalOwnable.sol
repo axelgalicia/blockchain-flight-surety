@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.7.5 <0.8.0;
+pragma solidity 0.8.0;
 
 
 contract OperationalOwnable {
@@ -16,7 +16,7 @@ contract OperationalOwnable {
 
     // Assign the contract to an owner
     constructor() {
-        contractOwner = msg.sender;
+        contractOwner = payable(msg.sender);
         emit TransferOwnership(address(0), contractOwner);
     }
 
@@ -78,7 +78,7 @@ contract OperationalOwnable {
     // Define a function to renounce ownerhip
     function renounceOwnership() public onlyOwner {
         emit TransferOwnership(contractOwner, address(0));
-        contractOwner = address(0);
+        contractOwner = payable(address(0));
     }
 
     // Define a public function to transfer ownership

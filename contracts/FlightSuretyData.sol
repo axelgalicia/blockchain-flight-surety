@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma experimental ABIEncoderV2;
-pragma solidity >=0.7.5 <0.8.0;
+pragma solidity 0.8.0;
 
 import "./SafeMath.sol";
 import "./OperationalOwnable.sol";
@@ -68,6 +68,9 @@ contract FlightSuretyData is OperationalOwnable {
      */
     fallback() external payable {
         fund();
+    }
+
+    receive() external payable {
     }
 
     /********************************************************************************************/

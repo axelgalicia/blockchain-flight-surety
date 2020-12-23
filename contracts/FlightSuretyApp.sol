@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.7.5 <0.8.0;
+pragma solidity 0.8.0;
 
 import "./SafeMath.sol";
 import "./OperationalOwnable.sol";
@@ -123,7 +123,7 @@ contract FlightSuretyApp is OperationalOwnable {
         returns (bool success, uint256 votes)
     {
         require(bytes(name).length > 0, "Name cannot be empty");
-        dataContract.registerAirline(msg.sender, name);
+        dataContract.registerAirline(payable(msg.sender), name);
         return (true, 0);
     }
 
@@ -135,7 +135,7 @@ contract FlightSuretyApp is OperationalOwnable {
     external returns (bool success)
      {
          require(bytes(name).length > 0, "Name cannot be empty");
-         dataContract.registerFlight(msg.sender, name, timestamp);
+         dataContract.registerFlight(payable(msg.sender), name, timestamp);
          return (true);
 
      }
@@ -178,7 +178,7 @@ contract FlightSuretyApp is OperationalOwnable {
     }
 
     function getDataContractAddress() external view returns (address payable) {
-        return address(dataContract);
+        return payable(dataContract);
     }
 
     // Called by oracle when a response is available to an outstanding request

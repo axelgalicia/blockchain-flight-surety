@@ -32,7 +32,7 @@
     "express": "^4.17.1",
     "ngx-toastr": "^13.1.0",
     "rxjs": "^6.6.3",
-    "solc": "^0.7.5",
+    "solc": "0.8.0",
     "start-server-webpack-plugin": "^2.2.5",
     "truffle": "^5.1.51",
     "tslib": "^2.0.3",
