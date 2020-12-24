@@ -147,7 +147,8 @@
     },
     {
       "stateMutability": "payable",
-      "type": "fallback"
+      "type": "fallback",
+      "payable": true
     },
     {
       "inputs": [],
@@ -160,7 +161,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -173,7 +175,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -193,7 +196,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -230,7 +234,8 @@
     },
     {
       "stateMutability": "payable",
-      "type": "receive"
+      "type": "receive",
+      "payable": true
     },
     {
       "inputs": [
@@ -291,7 +296,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -348,7 +354,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -378,28 +385,32 @@
       "name": "buy",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function"
+      "type": "function",
+      "payable": true
     },
     {
       "inputs": [],
       "name": "creditInsurees",
       "outputs": [],
       "stateMutability": "pure",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
       "name": "pay",
       "outputs": [],
       "stateMutability": "pure",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
       "name": "fund",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function"
+      "type": "function",
+      "payable": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.8.0+commit.c7dfd78e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address payable\",\"name\":\"newAddress\",\"type\":\"address\"}],\"name\":\"AuthorizedAppContractUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"components\":[{\"internalType\":\"enum FlightSuretyData.AirlineStatus\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"address payable\",\"name\":\"airlineAddress\",\"type\":\"address\"}],\"indexed\":false,\"internalType\":\"struct FlightSuretyData.Airline\",\"name\":\"airline\",\"type\":\"tuple\"}],\"name\":\"NewAirlineRegistered\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"airlineName\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"flightName\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"name\":\"NewFlightRegistered\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"value\",\"type\":\"bool\"}],\"name\":\"TestBooleanValue\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"TestIntValue\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"value\",\"type\":\"string\"}],\"name\":\"TestStringValue\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"oldOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"TransferOwnership\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"mode\",\"type\":\"bool\"}],\"name\":\"UpdateOperationalStatus\",\"type\":\"event\"},{\"stateMutability\":\"payable\",\"type\":\"fallback\"},{\"inputs\":[],\"name\":\"allAirlines\",\"outputs\":[{\"components\":[{\"internalType\":\"enum FlightSuretyData.AirlineStatus\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"address payable\",\"name\":\"airlineAddress\",\"type\":\"address\"}],\"internalType\":\"struct FlightSuretyData.Airline[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"allFlights\",\"outputs\":[{\"components\":[{\"internalType\":\"bool\",\"name\":\"isRegistered\",\"type\":\"bool\"},{\"internalType\":\"uint8\",\"name\":\"statusCode\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"updatedTimestamp\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"enum FlightSuretyData.AirlineStatus\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"address payable\",\"name\":\"airlineAddress\",\"type\":\"address\"}],\"internalType\":\"struct FlightSuretyData.Airline\",\"name\":\"airline\",\"type\":\"tuple\"}],\"internalType\":\"struct FlightSuretyData.Flight[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"buy\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"creditInsurees\",\"outputs\":[],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"fund\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isOperational\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"kill\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pay\",\"outputs\":[],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"airlineAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"name\":\"registerAirline\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"airlineAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"flightName\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"flightTime\",\"type\":\"uint256\"}],\"name\":\"registerFlight\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"mode\",\"type\":\"bool\"}],\"name\":\"setOperationalStatus\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"newAddress\",\"type\":\"address\"}],\"name\":\"updateAuthorizedAppContract\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"buy()\":{\"details\":\"Buy insurance for a flight\"},\"constructor\":{\"details\":\"Constructor      The deploying account becomes contractOwner\"},\"creditInsurees()\":{\"details\":\"Credits payouts to insurees\"},\"fund()\":{\"details\":\"Initial funding for the insurance. Unless there are too many delayed flights      resulting in insurance payouts, the contract should be self-sustaining\"},\"isOperational()\":{\"details\":\"Get operating status of contract\",\"returns\":{\"_0\":\"A bool that is the current operating status\"}},\"pay()\":{\"details\":\"Transfers eligible payout funds to insuree\"},\"registerAirline(address,string)\":{\"details\":\"Add an airline to the registration queue      Can only be called from FlightSuretyApp contract\"},\"registerFlight(address,string,uint256)\":{\"details\":\"Add new Flight\"},\"setOperationalStatus(bool)\":{\"details\":\"Sets contract operations on/off When operational mode is disabled, all write transactions except for this one will fail\"},\"updateAuthorizedAppContract(address)\":{\"details\":\"Update the authorized app contract address\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/media/indigo/backup/AXEL/Personal/Tutorials/blocksurety/blockchain-flight-surety/contracts/FlightSuretyData.sol\":\"FlightSuretyData\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/indigo/backup/AXEL/Personal/Tutorials/blocksurety/blockchain-flight-surety/contracts/FlightSuretyData.sol\":{\"keccak256\":\"0x5f725e1ab4155278115286dc965051bd5ea1db1ecf392c4c3224cc5513ae141c\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://78eb0772501afa524809565e085516b42670ea8d487534c231c11b15a6fcc9d8\",\"dweb:/ipfs/QmURg8Mehc3Bf7pstEe96x7JPmDs19trWYFqHbcvQyU5mb\"]},\"/media/indigo/backup/AXEL/Personal/Tutorials/blocksurety/blockchain-flight-surety/contracts/OperationalOwnable.sol\":{\"keccak256\":\"0x350a46261ed387f53765869bcacd6a30b6fc81ac495af5d433f49db039926da0\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://acf825548c99bb59d9deb98ddca6edde95486cd4fc3cc6e2b2412135634fc981\",\"dweb:/ipfs/Qmc4coFnUXiswo7B7rgR8THLtA3MWfGhWzg2RtbKQVi6m9\"]},\"/media/indigo/backup/AXEL/Personal/Tutorials/blocksurety/blockchain-flight-surety/contracts/SafeMath.sol\":{\"keccak256\":\"0xdc64d0ad83e9868c6f81cd015f0fb0cfe5f98c803f7025127fc6c4c2fb82a4cb\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://7bfb8095e01b4b00495c07f94ff6b15e0692072f15db9ba7ed799689b2df9fd9\",\"dweb:/ipfs/Qma2DQAMMoAgf7L1iQboDxGHNNo7TLvWGhND6doKJ4wqC3\"]}},\"version\":1}",
@@ -20879,9 +20890,157 @@
     "name": "solc",
     "version": "0.8.0+commit.c7dfd78e.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "1337": {
+      "events": {
+        "0xb58d590ed56d56a6fa0d8a7637ff54c9117435e0366ae25ca47b29296f47ac03": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address payable",
+              "name": "newAddress",
+              "type": "address"
+            }
+          ],
+          "name": "AuthorizedAppContractUpdated",
+          "type": "event"
+        },
+        "0xf552aa4c67473ff91f76059999074821b16f99df5ffd2cc08f0d13d5502caf5c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "enum FlightSuretyData.AirlineStatus",
+                  "name": "status",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "string",
+                  "name": "name",
+                  "type": "string"
+                },
+                {
+                  "internalType": "address payable",
+                  "name": "airlineAddress",
+                  "type": "address"
+                }
+              ],
+              "indexed": false,
+              "internalType": "struct FlightSuretyData.Airline",
+              "name": "airline",
+              "type": "tuple"
+            }
+          ],
+          "name": "NewAirlineRegistered",
+          "type": "event"
+        },
+        "0xd4bbba53ce61e9efb0a8a74165962291978bb51342d6545ed0963af556353213": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "airlineName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "flightName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewFlightRegistered",
+          "type": "event"
+        },
+        "0x66df68a7f0063121a65d15c9fa0ba7b1c80e48360baa813100472d71960da94d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "value",
+              "type": "bool"
+            }
+          ],
+          "name": "TestBooleanValue",
+          "type": "event"
+        },
+        "0xecbdc1ea0b1fa467184398864538a360b682db776daee1e670aa4f5e481b413e": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "TestIntValue",
+          "type": "event"
+        },
+        "0x8d63163eb6a83d99102c39dc0eb28e60f5292066deacc01cf1167d6aef2588b1": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "value",
+              "type": "string"
+            }
+          ],
+          "name": "TestStringValue",
+          "type": "event"
+        },
+        "0x5c486528ec3e3f0ea91181cff8116f02bfa350e03b8b6f12e00765adbb5af85c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "oldOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "TransferOwnership",
+          "type": "event"
+        },
+        "0xb6d5f5457d1c101e27891c7154e37f1578a63e19a5396705b34a4b3596b0cab5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "mode",
+              "type": "bool"
+            }
+          ],
+          "name": "UpdateOperationalStatus",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x86499eBCa704eA7CB254688F52305574899E63fC",
+      "transactionHash": "0x150251aa8c71a9d0ad12d4ba64dc9368855423b37a2c74af08d29e37a83dac43"
+    }
+  },
   "schemaVersion": "3.3.1",
-  "updatedAt": "2020-12-23T22:15:00.186Z",
+  "updatedAt": "2020-12-24T01:38:27.878Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {

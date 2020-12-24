@@ -22,8 +22,8 @@ export class AdminComponent implements OnInit, OnDestroy {
   private flightSuretyAppContract: Contract;
   private flightSuretyData: Contract;
 
-  currentAccount: string;
-  contractsForm: FormGroup;
+  currentAccount!: string;
+  contractsForm!: FormGroup;
 
   constructor(private formBuilder: FormBuilder,
     private toastService: ToastService,
@@ -51,12 +51,12 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   private listenForContracts(): void {
-    this.subs.add(this.blockchainService.deployedContracts$.subscribe(async (deployedContracts: Map<ContractName, any>) => {
+    this.subs.add(this.blockchainService.deployedContracts$.subscribe(async (deployedContracts: Map<ContractName, Contract>) => {
       if (deployedContracts === null) {
         return;
       }
-      this.flightSuretyAppContract = deployedContracts.get(ContractName.FLIGHT_SURETY_APP);
-      this.flightSuretyData = deployedContracts.get(ContractName.FLIGHT_SURETY_DATA);
+      this.flightSuretyAppContract = deployedContracts.get(ContractName.FLIGHT_SURETY_APP)!;
+      this.flightSuretyData = deployedContracts.get(ContractName.FLIGHT_SURETY_DATA)!;
       this.listenForCurrentAccount();
       this.updateFormStatus();
     }));
@@ -69,11 +69,11 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   private async isDataContractOperational(): Promise<boolean> {
-    return await this.flightSuretyData.instance.isOperational();
+    return await this.flightSuretyData!.instance.isOperational();
   }
 
   private async isAppContractOperational(): Promise<boolean> {
-    return await this.flightSuretyAppContract.instance.isOperational();
+    return await this.flightSuretyAppContract!.instance.isOperational();
   }
 
   private async updateFormStatus(): Promise<void> {
@@ -83,8 +83,8 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.contractsForm.patchValue({
       isDataOperational: isDataOn,
       isAppOperational: isAppOn,
-      dataContractAddress: this.flightSuretyData.instance.address,
-      appContractAddress: this.flightSuretyAppContract.instance.address,
+      dataContractAddress: this.flightSuretyData!.instance.address,
+      appContractAddress: this.flightSuretyAppContract!.instance.address,
     });
 
   }
@@ -98,7 +98,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   public async authorizeContract(): Promise<void> {
-    await this.flightSuretyData.instance.updateAuthorizedAppContract(this.getAppContractAddress, { from: this.currentAccount }).
+    await this.flightSuretyData!.instance.updateAuthorizedAppContract(this.getAppContractAddress, { from: this.currentAccount }).
       catch((error: any) => {
         console.log(error);
         this.toastService.showError('Could not authorize this contract!', 'Authorization');
@@ -106,7 +106,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   public async updateAppStatus(status: boolean): Promise<void> {
-    await this.flightSuretyAppContract.instance.setOperationalStatus(status, { from: this.currentAccount })
+    await this.flightSuretyAppContract!.instance.setOperationalStatus(status, { from: this.currentAccount })
       .catch((error: any) => {
         console.log(error);
         this.contractsForm.patchValue({
@@ -116,7 +116,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   public async updateDataStatus(status: boolean): Promise<void> {
-    await this.flightSuretyData.instance.setOperationalStatus(status, { from: this.currentAccount })
+    await this.flightSuretyData!.instance.setOperationalStatus(status, { from: this.currentAccount })
       .catch((error: any) => {
         console.log(error);
         this.contractsForm.patchValue({
@@ -143,7 +143,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
 
   getContractFormValue(formControlName: string): any {
-    return this.contractsForm.get(formControlName).value;
+    return this.contractsForm.get(formControlName)!.value;
   }
 
 }

@@ -7,7 +7,7 @@ import { Log } from "../common/interfaces/log.interface";
 import { WindowReferenceService } from './windowReference.service';
 import flight_surety_app_artifacts from '../../../build/contracts/FlightSuretyApp.json';
 import flight_surety_data_artifacts from '../../../build/contracts/FlightSuretyData.json';
-import { Subject, interval, Subscription, BehaviorSubject } from 'rxjs';
+import { Subject, interval, Subscription, BehaviorSubject, ReplaySubject } from 'rxjs';
 import { ToastService } from './toast.service';
 
 
@@ -16,20 +16,20 @@ export class Web3Service implements OnDestroy {
 
   private subs = new Subscription();
 
-  private web3: Web3;
+  private web3: Web3 = new Web3();
   private web3Configured = false;
-  private accounts: string[];
+  private accounts: string[] = [];
   // Contracts
   private flightSuretyApp: any;
   private flightSuretyData: any;
 
   // Deployed Contracts
   private deployedContracts = new Map<ContractName, Contract>();
-  private deployedContractsSource = new BehaviorSubject<Map<ContractName, Contract>>(null);
+  private deployedContractsSource = new ReplaySubject<Map<ContractName, Contract>>();
   public readonly deployedContracts$ = this.deployedContractsSource.asObservable();
 
   // Current Metamask Account
-  private currentAccountSource = new BehaviorSubject<string>(null);
+  private currentAccountSource = new ReplaySubject<string>();
   public readonly currentAccount$ = this.currentAccountSource.asObservable();
 
   // Tx Logs
@@ -37,7 +37,7 @@ export class Web3Service implements OnDestroy {
   public readonly txLog$ = this.txLogSource.asObservable();
 
   // Web3 Object
-  private web3Source = new BehaviorSubject<any>(null);
+  private web3Source = new ReplaySubject<any>();
   public readonly web3$ = this.web3Source.asObservable();
 
   constructor(private windowRef: WindowReferenceService,
@@ -107,14 +107,13 @@ export class Web3Service implements OnDestroy {
 
   listenForTxLogs(): void {
     this.subs.add(this.web3.eth.subscribe('logs', {}, (error, log) => {
-     })
-      .on("data", (log: Log) => {
-        this.txLogSource.next(log);
-      })
-      .on("error", (error) => {
-        this.toastService.showError('There was an error with the transaction, please try again.', 'Transaction')
-        console.log(error);
-      }));
+        if (error) {
+          this.toastService.showError('There was an error with the transaction, please try again.', 'Transaction')
+          console.log(error);
+        } else {
+          this.txLogSource.next(log);
+        }
+     }));
 
   }
 
@@ -123,7 +122,7 @@ export class Web3Service implements OnDestroy {
 
     const isMetamaskUnblocked = await this.isMetamaskUnlocked();
     if (!this.web3Configured || !isMetamaskUnblocked) {
-      this.setCurrentAccount(null);
+      this.setCurrentAccount('');
       this.accounts = [];
       return;
     }

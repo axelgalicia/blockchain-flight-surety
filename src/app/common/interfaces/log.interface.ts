@@ -7,5 +7,5 @@ export interface Log {
     transactionHash: string;
     blockHash: string;
     blockNumber: number;
-    type: string;
+    type?: string;
 }
