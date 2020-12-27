@@ -24,15 +24,15 @@ export class AppComponent implements OnInit, OnDestroy {
   private subs = new Subscription();
 
   // Public contracts
-  public FlightSuretyApp: Contract;
-  public FlightSuretyData: Contract;
+  public FlightSuretyApp!: Contract;
+  public FlightSuretyData!: Contract;
 
   //  Operational status
   operationalStatus = OperationalStatus.DISCONNECTED;
   statusclass = StatusClasses.DISCONNECTED;
 
-  currentAccountBalance: string;
-  currentAccount: string;
+  currentAccountBalance!: string;
+  currentAccount!: string;
 
   private web3: any;
 
@@ -81,8 +81,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   }
 
-  async updateAccountBalance(address: string) {
-    if (address === null) {
+  private async updateAccountBalance(address: string) {
+    if (address === '') {
       this.currentAccountBalance = '';
       return;
     }
@@ -97,22 +97,29 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subs.unsubscribe();
   }
 
-  async updateOperationalStatus() {
-    if (this.currentAccount === null) {
+  private updateOperationalStatus() {
+    if (this.currentAccount === '') {
       this.operationalStatus = OperationalStatus.DISCONNECTED;
       this.statusclass = this.getStatusClass(OperationalStatus.DISCONNECTED);
       return;
     }
 
     try {
-      const isActive = await this.FlightSuretyApp.instance.isOperational()
-        && await this.FlightSuretyData.instance.isOperational();
+      const isActive = this.isAppOperational() && this.isDataOperational();
       this.operationalStatus = isActive ? OperationalStatus.ACTIVE : OperationalStatus.PAUSED;
     } catch (e) {
       this.operationalStatus = OperationalStatus.DISCONNECTED;
     }
 
     this.statusclass = this.getStatusClass(this.operationalStatus);
+  }
+
+  private async isAppOperational(): Promise<boolean> {
+    return await this.FlightSuretyApp.instance.isOperational();
+  }
+
+  private async isDataOperational(): Promise<boolean> {
+    return await this.FlightSuretyData.instance.isOperational();
   }
 
   getStatusClass(operationalStatus: OperationalStatus): StatusClasses {

@@ -4,12 +4,12 @@
   "author": "Axel Galicia <axelgalicia@gmail.com>",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --port 8000",
     "build": "ng build",
     "test": "truffle test ./test/flightSurety.js",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "dapp": "ng serve",
+    "dapp": "ng serve --port 8000",
     "server": "rm -rf ./build/server && webpack --config webpack.config.server.js"
   },
   "private": true,
@@ -27,6 +27,7 @@
     "@material/card": "^8.0.0",
     "@truffle/contract": "^4.3.3",
     "@truffle/hdwallet-provider": "^1.2.0",
+    "bn.js": "^5.1.3",
     "http-browserify": "^1.7.0",
     "ngx-toastr": "^13.2.0",
     "rxjs": "~6.6.0",
