@@ -114,6 +114,29 @@ contract('Flight Surety Tests', async (accounts) => {
     assert.equal(airlinesRegistered.length, expectedAirlinesRegistered, "Owner should be able to register 3 more Airlines from owner\'s account");
     
   });
+
+
+  
+  it('(airline) show all Airlines registered', async function () {
+    
+    // ARRANGE
+    let owner = config.owner;
+    let expectedAirlinesRegistered = 4;
+    let airlinesRegistered = [];
+
+    // ACT
+    try {
+         airlinesRegistered = await config.flightSuretyData.allAirlines();
+         console.log(airlinesRegistered);
+    }
+    catch(e) {
+        result = false;
+    }
+
+    // ASSERT
+    assert.equal(true,true, "Owner should be able to register 3 more Airlines from owner\'s account");
+    
+  });
  
 
 });

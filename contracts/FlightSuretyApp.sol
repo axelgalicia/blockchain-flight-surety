@@ -125,6 +125,11 @@ contract FlightSuretyApp is OperationalOwnable {
         dataContract.registerAirline(payable(msg.sender), name);
     }
 
+    function payAirlineFee(string calldata airlineName) external {
+        require(bytes(airlineName).length > 0, "Airline Name cannot be empty");
+        dataContract.payAirlineFee(airlineName);
+    }
+
     /**
      * @dev Register a future flight for insuring.
      *
