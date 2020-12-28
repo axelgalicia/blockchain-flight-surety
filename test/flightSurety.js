@@ -9,6 +9,7 @@ contract('Flight Surety Tests', async (accounts) => {
   before('setup contract', async () => {
     config = await Test.Config(accounts);
     await config.flightSuretyData.updateAuthorizedAppContract(config.flightSuretyApp.address);
+    await config.flightSuretyApp.registerAirline('Air Canada');
   });
 
   /****************************************************************************************/
@@ -88,7 +89,29 @@ contract('Flight Surety Tests', async (accounts) => {
 
     // ASSERT
     assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
-    // assert.equal(true, true, "aaa");
+    
+  });
+
+  it('(airline) can register 3 more Airlines from owners\'s account', async function () {
+    
+    // ARRANGE
+    let owner = config.owner;
+    let expectedAirlinesRegistered = 4;
+    let airlinesRegistered = [];
+
+    // ACT
+    try {
+         await config.flightSuretyApp.registerAirline('AirUdacity2');
+         await config.flightSuretyApp.registerAirline('AirUdacity3');
+         await config.flightSuretyApp.registerAirline('AirUdacity4');
+         airlinesRegistered = await config.flightSuretyData.allAirlines();
+    }
+    catch(e) {
+        result = false;
+    }
+
+    // ASSERT
+    assert.equal(airlinesRegistered.length, expectedAirlinesRegistered, "Owner should be able to register 3 more Airlines from owner\'s account");
     
   });
  

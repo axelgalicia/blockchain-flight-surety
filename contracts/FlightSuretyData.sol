@@ -153,9 +153,9 @@ contract FlightSuretyData is OperationalOwnable {
     ) internal {
         Airline memory newAirline = Airline(status, name, airlineAddress, 0);
         airlinesMap[name] = newAirline;
-        emit NewAirlineRegistered(newAirline);
         registeredAirlines.push(newAirline);
         isARegisteredAirlineMap[airlineAddress] = true;
+        emit NewAirlineRegistered(newAirline);
     }
 
     function allAirlines() public view returns (Airline[] memory) {
