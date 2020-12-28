@@ -120,24 +120,24 @@ contract FlightSuretyApp is OperationalOwnable {
      */
     function registerAirline(string calldata name)
         external
-        returns (bool success, uint256 votes)
     {
         require(bytes(name).length > 0, "Name cannot be empty");
         dataContract.registerAirline(payable(msg.sender), name);
-        return (true, 0);
     }
 
     /**
      * @dev Register a future flight for insuring.
      *
      */
-    function registerFlight(string calldata name, uint256 timestamp) 
-    external returns (bool success)
+    function registerFlight(
+        string calldata airlineName, 
+        string calldata flightName, 
+        uint256 timestamp) 
+    external
      {
-         require(bytes(name).length > 0, "Name cannot be empty");
-         dataContract.registerFlight(payable(msg.sender), name, timestamp);
-         return (true);
-
+         require(bytes(flightName).length > 0, "Flight Name cannot be empty");
+         require(bytes(airlineName).length > 0, "Airline Name cannot be empty");
+         dataContract.registerFlight(payable(msg.sender), airlineName, flightName, timestamp);
      }
 
     // Generate a request for oracles to fetch flight information

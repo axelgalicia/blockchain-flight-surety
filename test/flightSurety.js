@@ -1,13 +1,14 @@
 
-var Test = require('../config/testConfig.js');
+var Test = require('./testConfig.js');
 var BigNumber = require('bignumber.js');
 
 contract('Flight Surety Tests', async (accounts) => {
 
+
   var config;
   before('setup contract', async () => {
     config = await Test.Config(accounts);
-    await config.flightSuretyData.authorizeCaller(config.flightSuretyApp.address);
+    await config.flightSuretyData.updateAuthorizedAppContract(config.flightSuretyApp.address);
   });
 
   /****************************************************************************************/
@@ -28,7 +29,7 @@ contract('Flight Surety Tests', async (accounts) => {
       let accessDenied = false;
       try 
       {
-          await config.flightSuretyData.setOperatingStatus(false, { from: config.testAddresses[2] });
+          await config.flightSuretyData.setOperationalStatus(false, { from: config.testAddresses[2] });
       }
       catch(e) {
           accessDenied = true;
@@ -43,9 +44,10 @@ contract('Flight Surety Tests', async (accounts) => {
       let accessDenied = false;
       try 
       {
-          await config.flightSuretyData.setOperatingStatus(false);
+          await config.flightSuretyData.setOperationalStatus(false, {from: config.owner});
       }
       catch(e) {
+          console.log(e);
           accessDenied = true;
       }
       assert.equal(accessDenied, false, "Access not restricted to Contract Owner");
@@ -54,7 +56,7 @@ contract('Flight Surety Tests', async (accounts) => {
 
   it(`(multiparty) can block access to functions using requireIsOperational when operating status is false`, async function () {
 
-      await config.flightSuretyData.setOperatingStatus(false);
+      await config.flightSuretyData.setOperationalStatus(false);
 
       let reverted = false;
       try 
@@ -67,27 +69,27 @@ contract('Flight Surety Tests', async (accounts) => {
       assert.equal(reverted, true, "Access not blocked for requireIsOperational");      
 
       // Set it back for other tests to work
-      await config.flightSuretyData.setOperatingStatus(true);
+      await config.flightSuretyData.setOperationalStatus(true);
 
   });
 
-  it('(airline) cannot register an Airline using registerAirline() if it is not funded', async () => {
+  it('(airline) cannot register an Airline itself using registerAirline() if there are less than 5 registered', async function () {
     
     // ARRANGE
-    let newAirline = accounts[2];
+    let newAirlineAddress = accounts[2];
 
     // ACT
     try {
-        await config.flightSuretyApp.registerAirline(newAirline, {from: config.firstAirline});
+         let response = await config.flightSuretyApp.registerAirline.call('AirUdacity', {from: newAirlineAddress});
     }
     catch(e) {
-
     }
-    let result = await config.flightSuretyData.isAirline.call(newAirline); 
+    let result = await config.flightSuretyData.isAirline(newAirlineAddress); 
 
     // ASSERT
     assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
-
+    // assert.equal(true, true, "aaa");
+    
   });
  
 

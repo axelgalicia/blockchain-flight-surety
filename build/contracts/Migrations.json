@@ -2564,12 +2564,12 @@
     "1337": {
       "events": {},
       "links": {},
-      "address": "0x154419D80AEB796d07D70932e4dEc25F32B96727",
-      "transactionHash": "0xbcce7beff951f1cd1652e65ae56240e8e45599e2268101b018a178da7b2e4f1c"
+      "address": "0xF0d82eFcfa5dca37bdB45ECffe258a232056E8Ad",
+      "transactionHash": "0x40d965da3f7d73b30bcefc2230285da17b9ed50af53a26995d43389f5a19bcc0"
     }
   },
   "schemaVersion": "3.3.1",
-  "updatedAt": "2020-12-24T01:38:27.917Z",
+  "updatedAt": "2020-12-27T21:52:59.988Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

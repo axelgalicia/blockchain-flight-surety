@@ -15,24 +15,21 @@ contract FlightSuretyData is OperationalOwnable {
     address payable private authorizedAppContract;
 
     // Mappings
-    mapping(address => Airline) private airlines;
-    mapping(string => Flight) private flights;
+    mapping(string => Airline) private airlinesMap;
+    mapping(address => bool) private isARegisteredAirlineMap;
+    mapping(string => Flight) private flightsMap;
 
     // Arrays
     Airline[] private registeredAirlines;
     Flight[] private registeredFlights;
 
-
-    enum AirlineStatus {
-        PendingApproval, 
-        Registered, 
-        Paid
-    }
+    enum AirlineStatus {PendingApproval, Registered, Paid}
 
     struct Airline {
         AirlineStatus status;
         string name;
-        address payable airlineAddress;
+        address ownerAddress;
+        uint256 votes;
     }
 
     struct Flight {
@@ -51,7 +48,11 @@ contract FlightSuretyData is OperationalOwnable {
 
     event NewAirlineRegistered(Airline airline);
 
-    event NewFlightRegistered(string airlineName, string flightName, uint256 timestamp);
+    event NewFlightRegistered(
+        string airlineName,
+        string flightName,
+        uint256 timestamp
+    );
 
     event TestStringValue(string value);
     event TestIntValue(uint256 value);
@@ -61,7 +62,7 @@ contract FlightSuretyData is OperationalOwnable {
      * @dev Constructor
      *      The deploying account becomes contractOwner
      */
-    constructor(){}
+    constructor() {}
 
     /**
      * @dev Fallback function for funding smart contract.
@@ -70,8 +71,7 @@ contract FlightSuretyData is OperationalOwnable {
         fund();
     }
 
-    receive() external payable {
-    }
+    receive() external payable {}
 
     /********************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
@@ -81,7 +81,10 @@ contract FlightSuretyData is OperationalOwnable {
     // before a function is allowed to be executed.
 
     modifier onlyAuthorizedContract() {
-        require(msg.sender == authorizedAppContract, "Caller not authorized to make this call");
+        require(
+            msg.sender == authorizedAppContract,
+            "Caller not authorized to make this call"
+        );
         _;
     }
 
@@ -119,57 +122,79 @@ contract FlightSuretyData is OperationalOwnable {
      *
      */
 
-    function registerAirline(address payable airlineAddress, string calldata name)
-        external
-        onlyAuthorizedContract
-    {
-        require(!_isAirlineRegisteredForAccount(airlineAddress), "This account has an Airline already registered");
-        Airline memory newAirline = Airline(AirlineStatus.Registered, name, airlineAddress);
-        airlines[airlineAddress] = newAirline;
-        emit NewAirlineRegistered(newAirline);
-        registeredAirlines.push(newAirline);
+    function registerAirline(
+        address payable airlineAddress,
+        string calldata name
+    ) external onlyAuthorizedContract {
+        bool isConsensusRequired = _isNumberOfAirlinesFourOrMore();
+        if (isConsensusRequired) {
+            require(
+                !_isAirlineRegisteredForAccount(airlineAddress),
+                "This account has an Airline already registered"
+            );
+            _registerAirline(
+                airlineAddress,
+                name,
+                AirlineStatus.PendingApproval
+            );
+        } else {
+            require(
+                isOwner(airlineAddress),
+                "Only contract ownwer can register first 4 Airlines"
+            );
+            _registerAirline(airlineAddress, name, AirlineStatus.Registered);
+        }
     }
 
-    function allAirlines()
-    public view
-    returns(Airline[] memory)
-    {
+    function _registerAirline(
+        address payable airlineAddress,
+        string calldata name,
+        AirlineStatus status
+    ) internal {
+        Airline memory newAirline = Airline(status, name, airlineAddress, 0);
+        airlinesMap[name] = newAirline;
+        emit NewAirlineRegistered(newAirline);
+        registeredAirlines.push(newAirline);
+        isARegisteredAirlineMap[airlineAddress] = true;
+    }
+
+    function allAirlines() public view returns (Airline[] memory) {
         return registeredAirlines;
     }
 
-     function allFlights()
-    public view
-    returns(Flight[] memory)
-    {
+    function allFlights() public view returns (Flight[] memory) {
         return registeredFlights;
     }
 
-
     /**
-    * @dev Add new Flight
-    *
-    */
-    function registerFlight(address payable airlineAddress, string memory flightName, uint256 flightTime) 
-    external
-    onlyAuthorizedContract 
-    {
-
-        require(!_isFlightRegistered(flightName), "Flight name already registered");
-        require(_isAirlineRegisteredForAccount(airlineAddress), "Airline does not exist");
-
-        Airline memory airline = airlines[airlineAddress];
-        Flight memory newFlight = Flight(
-            true,
-            0,
-            flightTime,
-            flightName,
-            airline
+     * @dev Add new Flight
+     *
+     */
+    function registerFlight(
+        address payable airlineAddress,
+        string memory airlineName,
+        string memory flightName,
+        uint256 flightTime
+    ) external onlyAuthorizedContract {
+        require(
+            !_isFlightRegistered(flightName),
+            "Flight name already registered"
         );
 
-        flights[flightName] = newFlight;
+        Airline memory airline = airlinesMap[airlineName];
+        require(
+            airline.ownerAddress == airlineAddress,
+            "Airline does not exist"
+        );
+
+        require(airline.votes >= 5, "Insufficient Votes to operate");
+      
+        Flight memory newFlight =
+            Flight(true, 0, flightTime, flightName, airline);
+
+        flightsMap[flightName] = newFlight;
         registeredFlights.push(newFlight);
         emit NewFlightRegistered(airline.name, flightName, flightTime);
-
     }
 
     /**
@@ -202,12 +227,32 @@ contract FlightSuretyData is OperationalOwnable {
 
     function fund() public payable {}
 
-    function _isAirlineRegisteredForAccount(address payable airlineAddress) internal view returns (bool) {
-        return bytes(airlines[airlineAddress].name).length > 1;
+    function _isNumberOfAirlinesFourOrMore() internal view returns (bool) {
+        return registeredAirlines.length >= 4;
     }
 
-    function _isFlightRegistered(string memory flightName) internal view returns (bool) {
-        return flights[flightName].isRegistered;
+    function isAirline(address payable airlineAddress)
+        public
+        view
+        returns (bool)
+    {
+        return _isAirlineRegisteredForAccount(airlineAddress);
+    }
+
+    function _isAirlineRegisteredForAccount(address payable airlineAddress)
+        internal
+        view
+        returns (bool)
+    {
+        return isARegisteredAirlineMap[airlineAddress];
+    }
+
+    function _isFlightRegistered(string memory flightName)
+        internal
+        view
+        returns (bool)
+    {
+        return flightsMap[flightName].isRegistered;
     }
 
     function _getFlightKey(

@@ -75,6 +75,11 @@ contract OperationalOwnable {
         return msg.sender == contractOwner;
     }
 
+    // Check if the passed address is the owner of the contract
+    function isOwner(address addressToValidate) public view returns (bool) {
+        return addressToValidate == contractOwner;
+    }
+
     // Define a function to renounce ownerhip
     function renounceOwnership() public onlyOwner {
         emit TransferOwnership(contractOwner, address(0));
