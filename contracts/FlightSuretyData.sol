@@ -106,7 +106,7 @@ contract FlightSuretyData is OperationalOwnable {
      */
     function updateAuthorizedAppContract(address payable newAddress)
         public
-        onlyOwner
+        onlyOwner onlyOperational
     {
         _updateAuthorizedAppContract(newAddress);
     }
@@ -132,7 +132,7 @@ contract FlightSuretyData is OperationalOwnable {
 
     function registerAirline(address payable airlineAddress, string memory name)
         external
-        onlyAuthorizedContract
+        onlyAuthorizedContract onlyOperational
     {
         bool isConsensusRequired = _isNumberOfAirlinesFourOrMore();
         if (isConsensusRequired) {
@@ -144,23 +144,25 @@ contract FlightSuretyData is OperationalOwnable {
             _registerAirline(
                 airlineAddress,
                 name,
-                AirlineStatus.PendingApproval
+                AirlineStatus.PendingApproval,
+                0
             );
         } else {
             require(
                 isOwner(airlineAddress),
                 "Only contract ownwer can register first 4 Airlines"
             );
-            _registerAirline(airlineAddress, name, AirlineStatus.Registered);
+            _registerAirline(airlineAddress, name, AirlineStatus.Registered, 5);
         }
     }
 
     function _registerAirline(
         address payable airlineAddress,
         string memory name,
-        AirlineStatus status
+        AirlineStatus status,
+        uint256 votes
     ) internal {
-        Airline memory newAirline = Airline(status, name, airlineAddress, 0);
+        Airline memory newAirline = Airline(status, name, airlineAddress, votes);
         airlinesMap[name] = newAirline;
         registeredAirlines.push(newAirline);
         isARegisteredAirlineMap[airlineAddress] = true;
@@ -193,6 +195,10 @@ contract FlightSuretyData is OperationalOwnable {
         return registeredFlights;
     }
 
+    function getFundingForAirlineName(string memory airlineName) public view returns (uint256) {
+        return fundingPerAirlineMap[airlineName];
+    }
+
     /**
      * @dev Add new Flight
      *
@@ -202,7 +208,7 @@ contract FlightSuretyData is OperationalOwnable {
         string calldata airlineName,
         string memory flightName,
         uint256 flightTime
-    ) external onlyAuthorizedContract {
+    ) external onlyAuthorizedContract onlyOperational {
         require(
             !_isFlightRegistered(flightName),
             "Flight name already registered"
@@ -236,16 +242,17 @@ contract FlightSuretyData is OperationalOwnable {
         address payable airlineAddress,
         string memory ownAirlineName,
         string memory airlineNameToVote
-    ) external onlyAuthorizedContract {
+    ) external onlyAuthorizedContract onlyOperational {
         require(
             _isFeeAlreadyPaid(ownAirlineName),
             "Fee needs to be paid first"
         );
-        Airline memory airline = airlinesMap[ownAirlineName];
+        Airline storage airline = airlinesMap[ownAirlineName];
         require(
             airline.ownerAddress == airlineAddress,
             "Airline does not exist"
         );
+        require(!_isSameString(airlineNameToVote, ownAirlineName), "Cannot Vote for itself");
         string[] memory voters =
             airlineNameToAirlineVotersMap[airlineNameToVote];
         for (uint256 i = 0; i < voters.length; i++) {
@@ -297,14 +304,14 @@ contract FlightSuretyData is OperationalOwnable {
 
     function fund() public payable {}
 
-    function payAirlineFee(string calldata airlineName)
-        public
-        payable
-        onlyAuthorizedContract
+    function payAirlineFee(string memory airlineName) public payable 
+    onlyOperational
+    returns (bool)
     {
         require(_isValidFeePaid(airlineName), "Invalid Fee paid");
         uint256 funded = fundingPerAirlineMap[airlineName];
         fundingPerAirlineMap[airlineName] = funded.add(msg.value);
+        return true;
     }
 
     function _isNumberOfAirlinesFourOrMore() internal view returns (bool) {

@@ -1,6 +1,7 @@
 
 var Test = require('./testConfig.js');
 var BigNumber = require('bignumber.js');
+const { default: Web3 } = require('web3');
 
 contract('Flight Surety Tests', async (accounts) => {
 
@@ -30,10 +31,11 @@ contract('Flight Surety Tests', async (accounts) => {
       let accessDenied = false;
       try 
       {
-          await config.flightSuretyData.setOperationalStatus(false, { from: config.testAddresses[2] });
+          await config.flightSuretyData.setOperationalStatus.call(false, { from: config.testAddresses[2] });
       }
       catch(e) {
           accessDenied = true;
+          // console.log(e)
       }
       assert.equal(accessDenied, true, "Access not restricted to Contract Owner");
             
@@ -45,39 +47,24 @@ contract('Flight Surety Tests', async (accounts) => {
       let accessDenied = false;
       try 
       {
-          await config.flightSuretyData.setOperationalStatus(false, {from: config.owner});
+          await config.flightSuretyData.setOperationalStatus.call(false, {from: config.owner});
       }
       catch(e) {
           console.log(e);
           accessDenied = true;
       }
       assert.equal(accessDenied, false, "Access not restricted to Contract Owner");
+      //       // Set it back for other tests to work
+      await config.flightSuretyData.setOperationalStatus(true);
       
   });
 
-  it(`(multiparty) can block access to functions using requireIsOperational when operating status is false`, async function () {
-
-      await config.flightSuretyData.setOperationalStatus(false);
-
-      let reverted = false;
-      try 
-      {
-          await config.flightSurety.setTestingMode(true);
-      }
-      catch(e) {
-          reverted = true;
-      }
-      assert.equal(reverted, true, "Access not blocked for requireIsOperational");      
-
-      // Set it back for other tests to work
-      await config.flightSuretyData.setOperationalStatus(true);
-
-  });
 
   it('(airline) cannot register an Airline itself using registerAirline() if there are less than 5 registered', async function () {
     
     // ARRANGE
     let newAirlineAddress = accounts[2];
+    let result = true;
 
     // ACT
     try {
@@ -85,7 +72,7 @@ contract('Flight Surety Tests', async (accounts) => {
     }
     catch(e) {
     }
-    let result = await config.flightSuretyData.isAirline(newAirlineAddress); 
+    result = await config.flightSuretyData.isAirline(newAirlineAddress); 
 
     // ASSERT
     assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
@@ -104,10 +91,11 @@ contract('Flight Surety Tests', async (accounts) => {
          await config.flightSuretyApp.registerAirline('AirUdacity2');
          await config.flightSuretyApp.registerAirline('AirUdacity3');
          await config.flightSuretyApp.registerAirline('AirUdacity4');
-         airlinesRegistered = await config.flightSuretyData.allAirlines();
+         airlinesRegistered = await config.flightSuretyData.allAirlines.call();
     }
     catch(e) {
         result = false;
+        console.log(e);
     }
 
     // ASSERT
@@ -116,7 +104,88 @@ contract('Flight Surety Tests', async (accounts) => {
   });
 
 
+
+  it('(airline) cannot vote without paying fee first', async function () {
+    
+    // ARRANGE
+    let result = true;
+
+    // ACT
+    try {
+         airlinesRegistered = await config.flightSuretyApp.vote.call('AirUdacity2', 'AirUdacity3');
+         
+    }
+    catch(e) {
+        result = false;
+    }
+
+    // ASSERT
+    assert.equal(result, false, "Airline should not be able to vote unless it already paid its fee");
+
+  });
+
   
+  it('(airline) can pay 10 Ether Fee', async function () {
+    
+    // ARRANGE
+    let paid = true;
+
+    // ACT
+    try {
+         airlinesRegistered = await config.flightSuretyData.payAirlineFee('AirUdacity2',{from: config.owner, value: web3.utils.toWei('10', 'ether')});
+    }
+    catch(e) {
+        console.log(e);
+        paid = false;
+       
+    }
+
+    // ASSERT
+    assert.equal(paid, true, "Airline should be able to pay 10 Ether fee");
+
+  });
+
+    
+  it('(airline) show funded ether for specific Airline', async function () {
+    
+    // ARRANGE
+    let fundedEther = 0;
+    let tenEther = web3.utils.toWei('10', 'ether');
+    // ACT
+    try {
+        fundedEther = await config.flightSuretyData.getFundingForAirlineName('AirUdacity2');
+    }
+    catch(e) {
+        result = false;
+        console.log(e);
+    }
+
+    // ASSERT
+    assert.equal(fundedEther.toString(), tenEther, "Owner should be able to register 3 more Airlines from owner\'s account");
+    
+  });
+
+
+  
+  it('(airline) can vote after paying fee', async function () {
+    
+    // ARRANGE
+    let result = true;
+
+    // ACT
+    try {
+         await config.flightSuretyApp.vote('AirUdacity2', 'AirUdacity3');
+    }
+    catch(e) {
+        result = false;
+        console.log(e);
+    }
+
+    // ASSERT
+    assert.equal(result, true, "Airline should be able to vote");
+
+  });
+
   it('(airline) show all Airlines registered', async function () {
     
     // ARRANGE
@@ -131,6 +200,7 @@ contract('Flight Surety Tests', async (accounts) => {
     }
     catch(e) {
         result = false;
+        console.log(e);
     }
 
     // ASSERT

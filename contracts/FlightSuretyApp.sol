@@ -119,15 +119,24 @@ contract FlightSuretyApp is OperationalOwnable {
      * @dev Add an airline to the registration queue
      */
     function registerAirline(string calldata name)
-        external
+        external onlyOperational
     {
         require(bytes(name).length > 0, "Name cannot be empty");
         dataContract.registerAirline(payable(msg.sender), name);
     }
 
-    function payAirlineFee(string calldata airlineName) external {
-        require(bytes(airlineName).length > 0, "Airline Name cannot be empty");
-        dataContract.payAirlineFee(airlineName);
+    // function payAirlineFee(string memory airlineName) external payable {
+    //     require(bytes(airlineName).length > 0, "Airline Name cannot be empty");
+    //     address(dataContract).call.value(msg.value)(abi.encodeWithSignature("payAirlineFee(string)", payAirlineFee));
+    // }
+
+    function vote(
+        string memory ownAirlineName,
+        string memory airlineNameToVote
+    ) external onlyOperational {
+        require(bytes(ownAirlineName).length > 0, "Airline Name cannot be empty");
+        require(bytes(airlineNameToVote).length > 0, "Airline Name cannot be empty");
+        dataContract.vote(payable(msg.sender), ownAirlineName, airlineNameToVote);
     }
 
     /**
@@ -138,7 +147,7 @@ contract FlightSuretyApp is OperationalOwnable {
         string calldata airlineName, 
         string calldata flightName, 
         uint256 timestamp) 
-    external
+    external onlyOperational
      {
          require(bytes(flightName).length > 0, "Flight Name cannot be empty");
          require(bytes(airlineName).length > 0, "Airline Name cannot be empty");
@@ -150,7 +159,7 @@ contract FlightSuretyApp is OperationalOwnable {
         address airline,
         string calldata flight,
         uint256 timestamp
-    ) external {
+    ) external onlyOperational {
         uint8 index = getRandomIndex(msg.sender);
 
         // Generate a unique key for storing the request
@@ -164,7 +173,7 @@ contract FlightSuretyApp is OperationalOwnable {
     }
 
     // Register an oracle with the contract
-    function registerOracle() external payable {
+    function registerOracle() external payable onlyOperational {
         // Require registration fee
         require(msg.value >= REGISTRATION_FEE, "Registration fee is required");
 
@@ -196,7 +205,7 @@ contract FlightSuretyApp is OperationalOwnable {
         string calldata flight,
         uint256 timestamp,
         uint8 statusCode
-    ) external {
+    ) external onlyOperational {
         require(
             (oracles[msg.sender].indexes[0] == index) ||
                 (oracles[msg.sender].indexes[1] == index) ||
