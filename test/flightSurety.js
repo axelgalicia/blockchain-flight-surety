@@ -174,7 +174,12 @@ contract('Flight Surety Tests', async (accounts) => {
 
     // ACT
     try {
-         await config.flightSuretyApp.vote('AirUdacity2', 'AirUdacity3');
+         let response = await config.flightSuretyApp.vote('AirUdacity2', 'AirUdacity3', {gas:1000000});
+         console.log(response);
+         response = await config.flightSuretyApp.vote('AirUdacity2', 'AirUdacity3', {gas:1000000});
+         console.log(response);
+         airlinesRegistered = await config.flightSuretyData.allAirlines();
+         console.log(airlinesRegistered);
     }
     catch(e) {
         result = false;

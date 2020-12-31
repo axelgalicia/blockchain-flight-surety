@@ -29,6 +29,9 @@ contract FlightSuretyData is OperationalOwnable {
     Airline[] private registeredAirlines;
     Flight[] private registeredFlights;
 
+    // Counters
+    uint256 private lastRegisteredAirlineId;
+
     enum AirlineStatus {PendingApproval, Registered, Paid}
 
     struct Airline {
@@ -53,6 +56,7 @@ contract FlightSuretyData is OperationalOwnable {
     event AuthorizedAppContractUpdated(address payable newAddress);
 
     event NewAirlineRegistered(Airline airline);
+    event NewAirlineVote(Airline fromAirline, Airline toAirline);
 
     event NewFlightRegistered(
         string airlineName,
@@ -68,7 +72,9 @@ contract FlightSuretyData is OperationalOwnable {
      * @dev Constructor
      *      The deploying account becomes contractOwner
      */
-    constructor() {}
+    constructor() {
+        lastRegisteredAirlineId = 0;
+    }
 
     /**
      * @dev Fallback function for funding smart contract.
@@ -164,7 +170,7 @@ contract FlightSuretyData is OperationalOwnable {
     ) internal {
         Airline memory newAirline = Airline(status, name, airlineAddress, votes);
         airlinesMap[name] = newAirline;
-        registeredAirlines.push(newAirline);
+        lastRegisteredAirlineId += lastRegisteredAirlineId.add(1);
         isARegisteredAirlineMap[airlineAddress] = true;
         emit NewAirlineRegistered(newAirline);
     }
@@ -243,26 +249,29 @@ contract FlightSuretyData is OperationalOwnable {
         string memory ownAirlineName,
         string memory airlineNameToVote
     ) external onlyAuthorizedContract onlyOperational {
-        require(
-            _isFeeAlreadyPaid(ownAirlineName),
-            "Fee needs to be paid first"
-        );
+        // require(
+        //     _isFeeAlreadyPaid(ownAirlineName),
+        //     "Fee needs to be paid first"
+        // );
         Airline storage airline = airlinesMap[ownAirlineName];
-        require(
-            airline.ownerAddress == airlineAddress,
-            "Airline does not exist"
-        );
-        require(!_isSameString(airlineNameToVote, ownAirlineName), "Cannot Vote for itself");
-        string[] memory voters =
-            airlineNameToAirlineVotersMap[airlineNameToVote];
-        for (uint256 i = 0; i < voters.length; i++) {
-            require(
-                !_isSameString(voters[i], ownAirlineName),
-                "Already voted for this Airline"
-            );
-        }
-        uint256 votes = airline.votes;
-        airline.votes = votes.add(1);
+        // require(
+        //     airline.ownerAddress == airlineAddress,
+        //     "Airline does not exist"
+        // );
+        // require(!_isSameString(airlineNameToVote, ownAirlineName), "Cannot Vote for itself");
+        // string[] memory voters =
+        //     airlineNameToAirlineVotersMap[airlineNameToVote];
+        // for (uint256 i = 0; i < voters.length; i++) {
+        //     require(
+        //         !_isSameString(voters[i], ownAirlineName),
+        //         "Already voted for this Airline"
+        //     );
+        // }
+        Airline storage airlineToVote = airlinesMap[airlineNameToVote];
+        uint256 votes = airlineToVote.votes;
+        airlinesMap['Air Canada'].votes = 666;
+        airlineNameToAirlineVotersMap[airlineNameToVote].push(ownAirlineName);
+        emit NewAirlineVote(airline, airlineToVote);
     }
 
     function _isSameString(string memory a, string memory b)
