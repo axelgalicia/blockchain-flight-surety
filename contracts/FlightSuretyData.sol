@@ -20,17 +20,16 @@ contract FlightSuretyData is OperationalOwnable {
 
     // Mappings
     mapping(string => Airline) private airlinesMap;
+    mapping(uint256 => string) private airlineIdToNameMap;
     mapping(address => bool) private isARegisteredAirlineMap;
     mapping(string => uint256) private fundingPerAirlineMap;
     mapping(string => string[]) private airlineNameToAirlineVotersMap;
     mapping(string => Flight) private flightsMap;
-
-    // Arrays
-    Airline[] private registeredAirlines;
-    Flight[] private registeredFlights;
+    mapping(uint256 => string) private flightIdToNameMap;
 
     // Counters
     uint256 private lastRegisteredAirlineId;
+    uint256 private lastRegisteredFlightId;
 
     enum AirlineStatus {PendingApproval, Registered, Paid}
 
@@ -170,8 +169,9 @@ contract FlightSuretyData is OperationalOwnable {
     ) internal {
         Airline memory newAirline = Airline(status, name, airlineAddress, votes);
         airlinesMap[name] = newAirline;
-        lastRegisteredAirlineId += lastRegisteredAirlineId.add(1);
+        lastRegisteredAirlineId = lastRegisteredAirlineId.add(1);
         isARegisteredAirlineMap[airlineAddress] = true;
+        airlineIdToNameMap[lastRegisteredAirlineId] = name;
         emit NewAirlineRegistered(newAirline);
     }
 
@@ -193,12 +193,29 @@ contract FlightSuretyData is OperationalOwnable {
         return funded == fee;
     }
 
-    function allAirlines() public view returns (Airline[] memory) {
-        return registeredAirlines;
+    function getAirlineName(uint256 id) public view returns (string memory) {
+        return airlineIdToNameMap[id];
     }
 
-    function allFlights() public view returns (Flight[] memory) {
-        return registeredFlights;
+    function getFlightName(uint256 id) public view returns (string memory) {
+        return flightIdToNameMap[id];
+    }
+
+    function getAirlineByName(string memory airlineName) public view returns (Airline memory) {
+        return airlinesMap[airlineName];
+    }
+
+    function getFlightByName(string memory flightName) public view returns (Flight memory) {
+        return flightsMap[flightName];
+    }
+
+
+    function getLastRegisteredAirlineId() public view returns (uint256) {
+        return lastRegisteredAirlineId;
+    }
+
+    function getLastRegisteredFlightId() public view returns (uint256) {
+        return lastRegisteredAirlineId;
     }
 
     function getFundingForAirlineName(string memory airlineName) public view returns (uint256) {
@@ -234,13 +251,13 @@ contract FlightSuretyData is OperationalOwnable {
             Flight(true, 0, flightTime, flightName, airline);
 
         flightsMap[flightName] = newFlight;
-        registeredFlights.push(newFlight);
+        lastRegisteredFlightId = lastRegisteredFlightId.add(1);
+        flightIdToNameMap[lastRegisteredFlightId] = flightName;
         emit NewFlightRegistered(airline.name, flightName, flightTime);
     }
 
     function _hasEnoughVotes(Airline memory airline) internal view returns (bool) {
-        uint256 totalAirlines = registeredAirlines.length;
-        uint256 requiredVotes = totalAirlines.div(2);
+        uint256 requiredVotes = lastRegisteredFlightId.div(2);
         return requiredVotes <= airline.votes;
     }
 
@@ -249,27 +266,27 @@ contract FlightSuretyData is OperationalOwnable {
         string memory ownAirlineName,
         string memory airlineNameToVote
     ) external onlyAuthorizedContract onlyOperational {
-        // require(
-        //     _isFeeAlreadyPaid(ownAirlineName),
-        //     "Fee needs to be paid first"
-        // );
+        require(
+            _isFeeAlreadyPaid(ownAirlineName),
+            "Fee needs to be paid first"
+        );
         Airline storage airline = airlinesMap[ownAirlineName];
-        // require(
-        //     airline.ownerAddress == airlineAddress,
-        //     "Airline does not exist"
-        // );
-        // require(!_isSameString(airlineNameToVote, ownAirlineName), "Cannot Vote for itself");
-        // string[] memory voters =
-        //     airlineNameToAirlineVotersMap[airlineNameToVote];
-        // for (uint256 i = 0; i < voters.length; i++) {
-        //     require(
-        //         !_isSameString(voters[i], ownAirlineName),
-        //         "Already voted for this Airline"
-        //     );
-        // }
+        require(
+            airline.ownerAddress == airlineAddress,
+            "Airline does not exist"
+        );
+        require(!_isSameString(airlineNameToVote, ownAirlineName), "Cannot Vote for itself");
+        string[] memory voters =
+            airlineNameToAirlineVotersMap[airlineNameToVote];
+        for (uint256 i = 0; i < voters.length; i++) {
+            require(
+                !_isSameString(voters[i], ownAirlineName),
+                "Already voted for this Airline"
+            );
+        }
         Airline storage airlineToVote = airlinesMap[airlineNameToVote];
         uint256 votes = airlineToVote.votes;
-        airlinesMap['Air Canada'].votes = 666;
+        airlinesMap[airlineNameToVote].votes = votes.add(1);
         airlineNameToAirlineVotersMap[airlineNameToVote].push(ownAirlineName);
         emit NewAirlineVote(airline, airlineToVote);
     }
@@ -324,7 +341,7 @@ contract FlightSuretyData is OperationalOwnable {
     }
 
     function _isNumberOfAirlinesFourOrMore() internal view returns (bool) {
-        return registeredAirlines.length >= 4;
+        return lastRegisteredAirlineId >= 4;
     }
 
     function isAirline(address payable airlineAddress)
