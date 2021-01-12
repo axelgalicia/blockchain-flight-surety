@@ -73,7 +73,7 @@ contract('Flight Surety Tests', async (accounts) => {
     }
     catch(e) {
     }
-    result = await config.flightSuretyData.isAirline(newAirlineAddress); 
+    result = await config.flightSuretyData.isARegisteredAirline(newAirlineAddress); 
 
     // ASSERT
     assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
@@ -116,7 +116,7 @@ contract('Flight Surety Tests', async (accounts) => {
     }
     catch(e) {
     }
-    result = await config.flightSuretyData.isAirline(newAirlineAddress); 
+    result = await config.flightSuretyData.isARegisteredAirline(newAirlineAddress); 
 
     // ASSERT
     assert.equal(result, false, "Airline should be able to register another airline if it hasn't provided funding");

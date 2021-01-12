@@ -2,6 +2,7 @@
 pragma solidity 0.8.0;
 
 import "./SafeMath.sol";
+import "./SharedModel.sol";
 import "./OperationalOwnable.sol";
 import "./FlightSuretyData.sol";
 
@@ -19,23 +20,6 @@ contract FlightSuretyApp is OperationalOwnable {
     /********************************************************************************************/
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
-
-    enum AirlineStatus {PendingApproval, Registered, Paid}
-
-    struct Airline {
-        AirlineStatus status;
-        string name;
-        address ownerAddress;
-        uint256 votes;
-    }
-
-    struct Flight {
-        bool isRegistered;
-        uint8 statusCode;
-        uint256 updatedTimestamp;
-        string name;
-        Airline airline;
-    }
 
     // Data contract
     FlightSuretyData dataContract;
@@ -152,7 +136,7 @@ contract FlightSuretyApp is OperationalOwnable {
             dataContract.registerAirline(
                 airlineAddress,
                 airlineName,
-                AirlineStatus.PendingApproval,
+                SharedModel.AirlineStatus.PendingApproval,
                 0
             );
         } else {
@@ -163,12 +147,10 @@ contract FlightSuretyApp is OperationalOwnable {
             dataContract.registerAirline(
                 airlineAddress,
                 airlineName,
-                AirlineStatus.Registered,
+                SharedModel.AirlineStatus.Registered,
                 5
             );
         }
-
-        dataContract.registerAirline(airlineAddress, airlineName);
     }
 
     function payAirlineFee(string memory airlineName)
@@ -198,7 +180,7 @@ contract FlightSuretyApp is OperationalOwnable {
             "Fee needs to be paid first"
         );
 
-        Airline storage airline = dataContract.getAirlineByName(ownAirlineName);
+        SharedModel.Airline memory airline = dataContract.getAirlineByName(ownAirlineName);
         address payable ownAirlineAddress = payable(msg.sender);
         require(
             airline.ownerAddress == ownAirlineAddress,
@@ -220,12 +202,6 @@ contract FlightSuretyApp is OperationalOwnable {
         dataContract.addVote(ownAirlineName, airlineNameToVote);
     }
 
-    function vote(
-        address payable airlineAddress,
-        string memory ownAirlineName,
-        string memory airlineNameToVote
-    ) external onlyOperational {}
-
     /**
      * @dev Register a future flight for insuring.
      *
@@ -237,46 +213,22 @@ contract FlightSuretyApp is OperationalOwnable {
     ) external onlyOperational {
         require(bytes(flightName).length > 0, "Flight Name cannot be empty");
         require(bytes(airlineName).length > 0, "Airline Name cannot be empty");
-        dataContract.registerFlight(
-            payable(msg.sender),
-            airlineName,
-            flightName,
-            timestamp
-        );
-    }
-
-    /**
-     * @dev Add new Flight
-     *
-     */
-    function registerFlight(
-        address payable airlineAddress,
-        string calldata airlineName,
-        string memory flightName,
-        uint256 flightTime
-    ) external onlyOperational {
         require(
-            !_isFlightRegistered(flightName),
+            !dataContract.isFlightRegistered(flightName),
             "Flight name already registered"
         );
 
         require(_isFeeAlreadyPaid(airlineName), "Fee needs to be paid first");
 
-        Airline memory airline = airlinesMap[airlineName];
+        SharedModel.Airline memory airline = dataContract.getAirlineByName(airlineName);
+        address payable airlineAddress = payable(msg.sender);
         require(
             airline.ownerAddress == airlineAddress,
             "Airline does not exist"
         );
 
         require(_hasEnoughVotes(airline), "Insufficient Votes to operate");
-
-        Flight memory newFlight =
-            Flight(true, 0, flightTime, flightName, airline);
-
-        flightsMap[flightName] = newFlight;
-        lastRegisteredFlightId = lastRegisteredFlightId.add(1);
-        flightIdToNameMap[lastRegisteredFlightId] = flightName;
-        emit NewFlightRegistered(airline.name, flightName, flightTime);
+        dataContract.registerFlight(airline, flightName, timestamp);
     }
 
     /**
@@ -445,22 +397,12 @@ contract FlightSuretyApp is OperationalOwnable {
         return random;
     }
 
-    function _isFeeAlreadyPaid(string memory airlineName)
+    function _hasEnoughVotes(SharedModel.Airline memory airline)
         private
         view
         returns (bool)
     {
-        uint256 fee = AIRLINE_REGISTRATION_FEE;
-        uint256 funded = fundingPerAirlineMap[airlineName];
-        return funded == fee;
-    }
-
-    function _hasEnoughVotes(Airline memory airline)
-        private
-        view
-        returns (bool)
-    {
-        uint256 requiredVotes = lastRegisteredFlightId.div(2);
+        uint256 requiredVotes = dataContract.getLastRegisteredFlightId().div(2);
         return requiredVotes <= airline.votes;
     }
 
@@ -493,14 +435,6 @@ contract FlightSuretyApp is OperationalOwnable {
         return dataContract.isARegisteredAirline(airlineAddress);
     }
 
-    function _isFlightRegistered(string memory flightName)
-        private
-        view
-        returns (bool)
-    {
-        return flightsMap[flightName].isRegistered;
-    }
-
     function _isValidFeePaid(string memory airlineName)
         private
         view
@@ -510,7 +444,7 @@ contract FlightSuretyApp is OperationalOwnable {
         uint256 etherSent = msg.value;
         uint256 currentFunded =
             dataContract.getFundingForAirlineName(airlineName);
-        uint256 totalFund = etherSend.add(currentFunded);
+        uint256 totalFund = etherSent.add(currentFunded);
         return totalFund <= fee;
     }
 

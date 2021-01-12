@@ -3,6 +3,7 @@ pragma experimental ABIEncoderV2;
 pragma solidity 0.8.0;
 
 import "./SafeMath.sol";
+import "./SharedModel.sol";
 import "./OperationalOwnable.sol";
 
 contract FlightSuretyData is OperationalOwnable {
@@ -16,34 +17,17 @@ contract FlightSuretyData is OperationalOwnable {
     address payable private authorizedAppContract;
 
     // Mappings
-    mapping(string => Airline) private airlinesMap;
+    mapping(string => SharedModel.Airline) private airlinesMap;
     mapping(uint256 => string) private airlineIdToNameMap;
     mapping(address => bool) private isARegisteredAirlineMap;
     mapping(string => uint256) private fundingPerAirlineMap;
     mapping(string => string[]) private airlineNameToAirlineVotersMap;
-    mapping(string => Flight) private flightsMap;
+    mapping(string => SharedModel.Flight) private flightsMap;
     mapping(uint256 => string) private flightIdToNameMap;
 
     // Ids
     uint256 private lastRegisteredAirlineId;
     uint256 private lastRegisteredFlightId;
-
-    enum AirlineStatus {PendingApproval, Registered, Paid}
-
-    struct Airline {
-        AirlineStatus status;
-        string name;
-        address ownerAddress;
-        uint256 votes;
-    }
-
-    struct Flight {
-        bool isRegistered;
-        uint8 statusCode;
-        uint256 updatedTimestamp;
-        string name;
-        Airline airline;
-    }
 
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
@@ -51,7 +35,7 @@ contract FlightSuretyData is OperationalOwnable {
 
     event AuthorizedAppContractUpdated(address payable newAddress);
 
-    event NewAirlineRegistered(Airline airline);
+    event NewAirlineRegistered(SharedModel.Airline airline);
     event NewAirlineVote(string fromAirline, string toAirline);
 
     event NewFlightRegistered(
@@ -116,10 +100,24 @@ contract FlightSuretyData is OperationalOwnable {
     function registerAirline(
         address payable airlineAddress,
         string memory name,
-        AirlineStatus status,
+        SharedModel.AirlineStatus status,
         uint256 votes
     ) external onlyOperational onlyAuthorizedContract {
         _registerAirline(airlineAddress, name, status, votes);
+    }
+
+    function registerFlight(
+        SharedModel.Airline memory airline,
+        string calldata flightName,
+        uint256 flightTime
+    ) external onlyOperational onlyAuthorizedContract {
+        SharedModel.Flight memory newFlight =
+            SharedModel.Flight(true, 0, flightTime, flightName, airline);
+
+        flightsMap[flightName] = newFlight;
+        lastRegisteredFlightId = lastRegisteredFlightId.add(1);
+        flightIdToNameMap[lastRegisteredFlightId] = flightName;
+        emit NewFlightRegistered(airline.name, flightName, flightTime);
     }
 
     function getAirlineName(uint256 id)
@@ -147,7 +145,7 @@ contract FlightSuretyData is OperationalOwnable {
         view
         onlyAuthorizedContract
         onlyOperational
-        returns (Airline memory)
+        returns (SharedModel.Airline memory)
     {
         return airlinesMap[airlineName];
     }
@@ -155,9 +153,8 @@ contract FlightSuretyData is OperationalOwnable {
     function getFlightByName(string memory flightName)
         external
         view
-        onlyAuthorizedContract
         onlyOperational
-        returns (Flight memory)
+        returns (SharedModel.Flight memory)
     {
         return flightsMap[flightName];
     }
@@ -165,7 +162,6 @@ contract FlightSuretyData is OperationalOwnable {
     function getLastRegisteredAirlineId()
         external
         view
-        onlyAuthorizedContract
         onlyOperational
         returns (uint256)
     {
@@ -175,7 +171,6 @@ contract FlightSuretyData is OperationalOwnable {
     function getLastRegisteredFlightId()
         external
         view
-        onlyAuthorizedContract
         onlyOperational
         returns (uint256)
     {
@@ -185,7 +180,6 @@ contract FlightSuretyData is OperationalOwnable {
     function getFundingForAirlineName(string memory airlineName)
         external
         view
-        onlyAuthorizedContract
         onlyOperational
         returns (uint256)
     {
@@ -195,7 +189,6 @@ contract FlightSuretyData is OperationalOwnable {
     function getAirlineVoters(string memory airlineName)
         external
         view
-        onlyAuthorizedContract
         onlyOperational
         returns (string[] memory)
     {
@@ -204,14 +197,14 @@ contract FlightSuretyData is OperationalOwnable {
 
     function payAirlineFee(string memory airlineName) external payable {
         fundingPerAirlineMap[airlineName] = fundingPerAirlineMap[airlineName]
-            .add(fund);
+            .add(msg.value);
     }
 
     function addVote(
         string memory ownAirlineName,
         string memory airlineNameToVote
     ) external onlyAuthorizedContract onlyOperational {
-        Airline storage airlineToVote = airlinesMap[airlineNameToVote];
+        SharedModel.Airline storage airlineToVote = airlinesMap[airlineNameToVote];
         uint256 votes = airlineToVote.votes;
         airlinesMap[airlineNameToVote].votes = votes.add(1);
         airlineNameToAirlineVotersMap[airlineNameToVote].push(ownAirlineName);
@@ -221,11 +214,19 @@ contract FlightSuretyData is OperationalOwnable {
     function isARegisteredAirline(address payable airlineAddress)
         external
         view
-        onlyAuthorizedContract
         onlyOperational
         returns (bool)
     {
         return isARegisteredAirlineMap[airlineAddress];
+    }
+
+    function isFlightRegistered(string memory flightName)
+        external
+        view
+        onlyOperational
+        returns (bool)
+    {
+        return flightsMap[flightName].isRegistered;
     }
 
     /**
@@ -237,11 +238,11 @@ contract FlightSuretyData is OperationalOwnable {
     function _registerAirline(
         address payable airlineAddress,
         string memory name,
-        AirlineStatus status,
+        SharedModel.AirlineStatus status,
         uint256 votes
     ) private {
-        Airline memory newAirline =
-            Airline(status, name, airlineAddress, votes);
+        SharedModel.Airline memory newAirline =
+            SharedModel.Airline(status, name, airlineAddress, votes);
         airlinesMap[name] = newAirline;
         lastRegisteredAirlineId = lastRegisteredAirlineId.add(1);
         isARegisteredAirlineMap[airlineAddress] = true;
