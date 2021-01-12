@@ -180,7 +180,8 @@ contract FlightSuretyApp is OperationalOwnable {
             "Fee needs to be paid first"
         );
 
-        SharedModel.Airline memory airline = dataContract.getAirlineByName(ownAirlineName);
+        SharedModel.Airline memory airline =
+            dataContract.getAirlineByName(ownAirlineName);
         address payable ownAirlineAddress = payable(msg.sender);
         require(
             airline.ownerAddress == ownAirlineAddress,
@@ -198,8 +199,14 @@ contract FlightSuretyApp is OperationalOwnable {
                 "Already voted for this Airline"
             );
         }
+        SharedModel.Airline memory airlineToVote =
+            dataContract.getAirlineByName(airlineNameToVote);
+        SharedModel.AirlineStatus status =
+            _hasEnoughVotes(airlineToVote)
+                ? SharedModel.AirlineStatus.Registered
+                : airlineToVote.status;
 
-        dataContract.addVote(ownAirlineName, airlineNameToVote);
+        dataContract.addVote(ownAirlineName, airlineNameToVote, status);
     }
 
     /**
@@ -220,11 +227,12 @@ contract FlightSuretyApp is OperationalOwnable {
 
         require(_isFeeAlreadyPaid(airlineName), "Fee needs to be paid first");
 
-        SharedModel.Airline memory airline = dataContract.getAirlineByName(airlineName);
+        SharedModel.Airline memory airline =
+            dataContract.getAirlineByName(airlineName);
         address payable airlineAddress = payable(msg.sender);
         require(
             airline.ownerAddress == airlineAddress,
-            "Airline does not exist"
+            "Airline does not own this airline name"
         );
 
         require(_hasEnoughVotes(airline), "Insufficient Votes to operate");

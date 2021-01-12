@@ -111,19 +111,12 @@ contract FlightSuretyData is OperationalOwnable {
         string calldata flightName,
         uint256 flightTime
     ) external onlyOperational onlyAuthorizedContract {
-        SharedModel.Flight memory newFlight =
-            SharedModel.Flight(true, 0, flightTime, flightName, airline);
-
-        flightsMap[flightName] = newFlight;
-        lastRegisteredFlightId = lastRegisteredFlightId.add(1);
-        flightIdToNameMap[lastRegisteredFlightId] = flightName;
-        emit NewFlightRegistered(airline.name, flightName, flightTime);
+        _registerFlight(airline, flightName, flightTime);
     }
 
     function getAirlineName(uint256 id)
         external
         view
-        onlyAuthorizedContract
         onlyOperational
         returns (string memory)
     {
@@ -133,7 +126,6 @@ contract FlightSuretyData is OperationalOwnable {
     function getFlightName(uint256 id)
         external
         view
-        onlyAuthorizedContract
         onlyOperational
         returns (string memory)
     {
@@ -143,7 +135,6 @@ contract FlightSuretyData is OperationalOwnable {
     function getAirlineByName(string memory airlineName)
         external
         view
-        onlyAuthorizedContract
         onlyOperational
         returns (SharedModel.Airline memory)
     {
@@ -174,7 +165,7 @@ contract FlightSuretyData is OperationalOwnable {
         onlyOperational
         returns (uint256)
     {
-        return lastRegisteredAirlineId;
+        return lastRegisteredFlightId;
     }
 
     function getFundingForAirlineName(string memory airlineName)
@@ -202,11 +193,14 @@ contract FlightSuretyData is OperationalOwnable {
 
     function addVote(
         string memory ownAirlineName,
-        string memory airlineNameToVote
+        string memory airlineNameToVote,
+        SharedModel.AirlineStatus status
     ) external onlyAuthorizedContract onlyOperational {
-        SharedModel.Airline storage airlineToVote = airlinesMap[airlineNameToVote];
+        SharedModel.Airline storage airlineToVote =
+            airlinesMap[airlineNameToVote];
         uint256 votes = airlineToVote.votes;
         airlinesMap[airlineNameToVote].votes = votes.add(1);
+        airlinesMap[airlineNameToVote].status = status;
         airlineNameToAirlineVotersMap[airlineNameToVote].push(ownAirlineName);
         emit NewAirlineVote(ownAirlineName, airlineNameToVote);
     }
@@ -248,6 +242,20 @@ contract FlightSuretyData is OperationalOwnable {
         isARegisteredAirlineMap[airlineAddress] = true;
         airlineIdToNameMap[lastRegisteredAirlineId] = name;
         emit NewAirlineRegistered(newAirline);
+    }
+
+    function _registerFlight(
+        SharedModel.Airline memory airline,
+        string calldata flightName,
+        uint256 flightTime
+    ) private {
+        SharedModel.Flight memory newFlight =
+            SharedModel.Flight(true, 0, flightTime, flightName, airline);
+
+        flightsMap[flightName] = newFlight;
+        lastRegisteredFlightId = lastRegisteredFlightId.add(1);
+        flightIdToNameMap[lastRegisteredFlightId] = flightName;
+        emit NewFlightRegistered(airline.name, flightName, flightTime);
     }
 
     /**

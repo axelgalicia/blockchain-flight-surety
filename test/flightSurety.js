@@ -28,74 +28,72 @@ contract('Flight Surety Tests', async (accounts) => {
 
   it(`(multiparty) can block access to setOperatingStatus() for non-Contract Owner account`, async function () {
 
-      // Ensure that access is denied for non-Contract Owner account
-      let accessDenied = false;
-      try 
-      {
-          await config.flightSuretyData.setOperationalStatus.call(false, { from: config.testAddresses[2] });
-      }
-      catch(e) {
-          accessDenied = true;
-          // console.log(e)
-      }
-      assert.equal(accessDenied, true, "Access not restricted to Contract Owner");
-            
+    // Ensure that access is denied for non-Contract Owner account
+    let accessDenied = false;
+    try {
+      await config.flightSuretyData.setOperationalStatus.call(false, { from: config.testAddresses[2] });
+    }
+    catch (e) {
+      accessDenied = true;
+      // console.log(e)
+    }
+    assert.equal(accessDenied, true, "Access not restricted to Contract Owner");
+
   });
 
   it(`(multiparty) can allow access to setOperatingStatus() for Contract Owner account`, async function () {
 
-      // Ensure that access is allowed for Contract Owner account
-      let accessDenied = false;
-      try 
-      {
-          await config.flightSuretyData.setOperationalStatus.call(false, {from: config.owner});
-      }
-      catch(e) {
-          console.log(e);
-          accessDenied = true;
-      }
-      assert.equal(accessDenied, false, "Access not restricted to Contract Owner");
-      //       // Set it back for other tests to work
-      await config.flightSuretyData.setOperationalStatus(true);
-      
+    // Ensure that access is allowed for Contract Owner account
+    let accessDenied = false;
+    try {
+      await config.flightSuretyData.setOperationalStatus.call(false, { from: config.owner });
+    }
+    catch (e) {
+      console.log(e);
+      accessDenied = true;
+    }
+    assert.equal(accessDenied, false, "Access not restricted to Contract Owner");
+    //       // Set it back for other tests to work
+    await config.flightSuretyData.setOperationalStatus(true);
+
   });
 
 
   it('(airline) cannot register an Airline itself using registerAirline() if there are less than 5 registered', async function () {
-    
+
     // ARRANGE
     let newAirlineAddress = accounts[2];
     let result = true;
 
     // ACT
     try {
-         let response = await config.flightSuretyApp.registerAirline.call('AirUdacity', {from: newAirlineAddress});
+      let response = await config.flightSuretyApp.registerAirline.call('AirUdacity', { from: newAirlineAddress });
     }
-    catch(e) {
+    catch (e) {
     }
-    result = await config.flightSuretyData.isARegisteredAirline(newAirlineAddress); 
+    result = await config.flightSuretyData.isARegisteredAirline(newAirlineAddress);
 
     // ASSERT
     assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
-    
+
   });
 
   it('(airline) can register 3 more Airlines from owners\'s account', async function () {
-    
+
     // ARRANGE
     let result = true;
 
     // ACT
     try {
-         await config.flightSuretyApp.registerAirline('AirUdacity2');
-         await config.flightSuretyApp.registerAirline('AirUdacity3');
-         await config.flightSuretyApp.registerAirline('AirUdacity4');
+      await config.flightSuretyApp.registerAirline('AirUdacity2');
+      await config.flightSuretyApp.registerAirline('AirUdacity3');
+      await config.flightSuretyApp.registerAirline('AirUdacity4');
       //  console.log('id Air:' + await config.flightSuretyData.getLastRegisteredAirlineId.call());
       //  console.log('id :' + await config.flightSuretyData.getLastRegisteredAirlineId.call());
     }
-    catch(e) {
-        result = false;
-        console.log(e);
+    catch (e) {
+      result = false;
+      console.log(e);
     }
 
     // ASSERT
@@ -105,38 +103,38 @@ contract('Flight Surety Tests', async (accounts) => {
 
 
   it('(airline) The no-owner can register an Airline itself using registerAirline() after there are 5 registered', async function () {
-    
+
     // ARRANGE
     let newAirlineAddress = accounts[2];
     let result = true;
 
     // ACT
     try {
-         let response = await config.flightSuretyApp.registerAirline.call('AirUdacity5', {from: newAirlineAddress});
+      let response = await config.flightSuretyApp.registerAirline.call('AirUdacity5', { from: newAirlineAddress });
     }
-    catch(e) {
+    catch (e) {
     }
-    result = await config.flightSuretyData.isARegisteredAirline(newAirlineAddress); 
+    result = await config.flightSuretyData.isARegisteredAirline(newAirlineAddress);
 
     // ASSERT
     assert.equal(result, false, "Airline should be able to register another airline if it hasn't provided funding");
-    
+
   });
 
 
 
   it('(airline) cannot vote without paying fee first', async function () {
-    
+
     // ARRANGE
     let result = true;
 
     // ACT
     try {
-         airlinesRegistered = await config.flightSuretyApp.vote.call('AirUdacity2', 'AirUdacity3');
-         
+      airlinesRegistered = await config.flightSuretyApp.vote.call('AirUdacity2', 'AirUdacity3');
+
     }
-    catch(e) {
-        result = false;
+    catch (e) {
+      result = false;
     }
 
     // ASSERT
@@ -144,20 +142,20 @@ contract('Flight Surety Tests', async (accounts) => {
 
   });
 
-  
+
   it('(airline) can pay 10 Ether Fee', async function () {
-    
+
     // ARRANGE
     let paid = true;
 
     // ACT
     try {
-         airlinesRegistered = await config.flightSuretyData.payAirlineFee('AirUdacity2',{from: config.owner, value: web3.utils.toWei('10', 'ether')});
+      airlinesRegistered = await config.flightSuretyData.payAirlineFee('AirUdacity2', { from: config.owner, value: web3.utils.toWei('10', 'ether') });
     }
-    catch(e) {
-        console.log(e);
-        paid = false;
-       
+    catch (e) {
+      console.log(e);
+      paid = false;
+
     }
 
     // ASSERT
@@ -165,40 +163,40 @@ contract('Flight Surety Tests', async (accounts) => {
 
   });
 
-    
+
   it('(airline) show funded ether for specific Airline', async function () {
-    
+
     // ARRANGE
     let fundedEther = 0;
     let tenEther = web3.utils.toWei('10', 'ether');
     // ACT
     try {
-        fundedEther = await config.flightSuretyData.getFundingForAirlineName('AirUdacity2');
+      fundedEther = await config.flightSuretyData.getFundingForAirlineName('AirUdacity2');
     }
-    catch(e) {
-        result = false;
-        console.log(e);
+    catch (e) {
+      result = false;
+      console.log(e);
     }
 
     // ASSERT
     assert.equal(fundedEther.toString(), tenEther, "Should be able to display funding");
-    
+
   });
 
 
-  
+
   it('(airline) can vote after paying fee', async function () {
-    
+
     // ARRANGE
     let result = true;
 
     // ACT
     try {
-         let response = await config.flightSuretyApp.vote('AirUdacity2', 'AirUdacity3');
+      let response = await config.flightSuretyApp.vote('AirUdacity2', 'AirUdacity3');
     }
-    catch(e) {
-        result = false;
-        console.log(e);
+    catch (e) {
+      result = false;
+      console.log(e);
     }
 
     // ASSERT
@@ -208,16 +206,16 @@ contract('Flight Surety Tests', async (accounts) => {
 
 
   it('(airline) cannot vote for the same Airline even after paid fee', async function () {
-    
+
     // ARRANGE
     let result = true;
 
     // ACT
     try {
-         let response = await config.flightSuretyApp.vote.call('AirUdacity2', 'AirUdacity3');
+      let response = await config.flightSuretyApp.vote.call('AirUdacity2', 'AirUdacity3');
     }
-    catch(e) {
-        result = false;
+    catch (e) {
+      result = false;
     }
 
     // ASSERT
@@ -225,56 +223,83 @@ contract('Flight Surety Tests', async (accounts) => {
 
   });
 
-  /*
 
-    it('(airline) Display all airlines', async function () {
-      
-      // ARRANGE
-      let result = true;
 
-      // ACT
-      try {
+  // it('(airline) Display all airlines', async function () {
 
-        const lastIdAirline = await config.flightSuretyData.getLastRegisteredAirlineId.call();
-        for (let i = 1 ; i <= lastIdAirline ; i++) {
-          let airlineName = await config.flightSuretyData.getAirlineName(i);
-          console.log(await config.flightSuretyData.getAirlineByName(airlineName));
-        }
-          
-      }
-      catch(e) {
-          result = false;
-          console.log(e);
-      }
+  //   // ARRANGE
+  //   let result = true;
 
-      // ASSERT
-      assert.equal(result, true, "Airlines should be displayed");
+  //   // ACT
+  //   try {
 
-    });
+  //     const lastIdAirline = await config.flightSuretyData.getLastRegisteredAirlineId.call();
+  //     for (let i = 1 ; i <= lastIdAirline ; i++) {
+  //       let airlineName = await config.flightSuretyData.getAirlineName(i);
+  //       console.log(await config.flightSuretyData.getAirlineByName(airlineName));
+  //     }
 
-  */
+  //   }
+  //   catch(e) {
+  //       result = false;
+  //       console.log(e);
+  //   }
 
-  it('(airline) show all Airlines registered', async function () {
-    
+  //   // ASSERT
+  //   assert.equal(result, true, "Airlines should be displayed");
+
+  // });
+
+
+
+
+  it('(airline) can register a flight', async function () {
+
     // ARRANGE
-    let owner = config.owner;
-    let expectedAirlinesRegistered = 4;
-    let airlinesRegistered = [];
+    let result = true;
+    const flightTime = 1610420400817;
 
     // ACT
     try {
-        // airlinesRegistered = await config.flightSuretyData.allAirlines();
-        // console.log(airlinesRegistered);
+      await config.flightSuretyApp.registerFlight('AirUdacity2', 'AU2-0001', 1610420400817, { from: config.owner });
     }
-    catch(e) {
-        result = false;
-        console.log(e);
+    catch (e) {
+      result = false;
+      console.log(e);
     }
 
     // ASSERT
-    assert.equal(true,true, "Owner should be able to register 3 more Airlines from owner\'s account");
-    
+    assert.equal(result, true, "Airline should be able to register a flight");
+
   });
- 
+
+  /*
+
+  it('(flights) show all Flights registered', async function () {
+
+    // ARRANGE
+    let owner = config.owner;
+    let expectedFlightsRegistered = 1;
+    let flightsRegistered = [];
+
+    // ACT
+    try {
+
+      const lastFlightId = await config.flightSuretyData.getLastRegisteredFlightId.call();
+      for (let i = 1; i <= lastFlightId; i++) {
+        let flightName = await config.flightSuretyData.getFlightName(i);
+        console.log(await config.flightSuretyData.getFlightByName(flightName));
+      }
+    }
+    catch (e) {
+      result = false;
+      console.log(e);
+    }
+
+    // ASSERT
+    assert.equal(true, true, "Should be able to list all Flights");
+
+  });
+*/
 
 });

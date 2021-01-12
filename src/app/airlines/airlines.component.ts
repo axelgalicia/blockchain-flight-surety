@@ -18,20 +18,20 @@ export class AirlinesComponent implements OnInit {
 
 
   // Public contracts
-  private FlightSuretyApp: Contract;
-  private FlightSuretyData: Contract;
+  private FlightSuretyApp!: Contract;
+  private FlightSuretyData!: Contract;
 
-  currentAccount: string;
+  currentAccount!: string;
 
-  contractsForm: FormGroup;
+  contractsForm!: FormGroup;
 
-  dataContractAddress: string;
-  appContractAddress: string;
+  dataContractAddress!: string;
+  appContractAddress!: string;
 
-  newFlightsForm: FormGroup;
+  newFlightsForm!: FormGroup;
 
-  newFlightNumber: string;
-  newFlightTime: string;
+  newFlightNumber!: string;
+  newFlightTime!: string;
 
   dataRgisteredFlights: RegisteredFlight[] = [];
   displayedColumns: string[] = ['id', 'name', 'timestamp'];
